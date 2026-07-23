@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ============================================================= -->
+<!-- ✏️ TEXTE BEARBEITEN:  Suche in dieser Datei nach  ✏️          -->
+<!--    Jeder mit ✏️ markierte Block ist ein Text, den du frei      -->
+<!--    per Copy-Paste ersetzen kannst. Ändere NUR den Text         -->
+<!--    zwischen den Tags, nicht die Tags/Klammern selbst.          -->
+<!-- ============================================================= -->
+
+<!-- ✏️ 01 · Seitentitel (Browser-Tab & SEO) -->
+<title>Peacock Menu™ · Patentierte Menünavigation · EP 2 616 913 B1 / US 8,756,529 B2</title>
+<!-- ✏️ 02 · Meta-Beschreibung (SEO / Vorschautext bei Google) -->
+<meta name="description" content="Peacock Menu: die patentierte Menünavigation, bei der jede Ebene exakt am Klickpunkt konvergiert. Live-Vergleich, RSI-Ergonomie und Live-Demo. EP 2 616 913 B1 / US 8,756,529 B2, Dr. Kay Dirk Ullmann.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1b1e1c; --ink-soft:#4c524e; --line:#d8dcd8; --paper:#fdfdfc; --panel:#f4f6f3;
+  --green:#18A303; --green-deep:#0E7A00; --green-soft:#e9f5e5;
+  /* Peacock-Markenpalette (neu) — für Logo, Hero-Akzente, Sektionsteiler */
+  --pk-teal:#0b6e6e; --pk-teal-deep:#082f2f; --pk-blue:#1c4f7c; --pk-gold:#c9a227; --pk-gold-soft:#f8efd2;
+  --pk-grad: linear-gradient(120deg, var(--pk-teal-deep), var(--pk-teal) 38%, var(--green-deep) 66%, var(--pk-gold) 100%);
+  /* Vergleichsfarben — folgen der Konvention aus DEMO V6 (rot = klassisch, grün = Peacock Menu) */
+  --classic:#b3261e; --classic-soft:#fbeae8;
+  --disp:"Space Grotesk",sans-serif; --body:"Source Sans 3",sans-serif; --mono:"IBM Plex Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto} .draw{animation:none !important;stroke-dashoffset:0 !important} .reveal{opacity:1 !important;transform:none !important;transition:none !important}}
+body{font-family:var(--body);color:var(--ink);background:var(--paper);line-height:1.6;font-size:17px}
+a{color:var(--green-deep)}
+.wrap{max-width:1220px;margin:0 auto;padding:0 24px}
+.wrap-hero{max-width:1560px;margin:0 auto;padding:0 32px;width:100%}
+::selection{background:var(--pk-gold-soft);color:var(--pk-teal-deep)}
+
+/* Reveal-on-scroll (dezent, respektiert prefers-reduced-motion) */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* Logo / Marke */
+.logo-mark{width:30px;height:30px;flex:none}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+.brand-word{font-family:var(--disp);font-weight:700;font-size:18px;letter-spacing:-.01em;line-height:1.1}
+.brand-word b{color:var(--pk-teal-deep)}
+/* Kopfzeile */
+header{border-bottom:1px solid var(--line);background:rgba(253,253,252,.92);backdrop-filter:saturate(140%) blur(6px);position:sticky;top:0;z-index:50}
+.head{display:flex;align-items:center;justify-content:space-between;gap:16px;height:64px}
+nav{display:flex;align-items:center}
+nav a{font-family:var(--disp);font-size:14px;text-decoration:none;color:var(--ink);margin-left:20px}
+nav a:hover{color:var(--pk-teal-deep)}
+nav a:focus-visible,.btn:focus-visible,.lv-kpi:focus-visible,.scroll-cue:focus-visible{outline:2px solid var(--pk-teal-deep);outline-offset:2px}
+.head-right{display:flex;align-items:center;gap:18px;min-width:0}
+@media(max-width:900px){
+  .head{flex-wrap:wrap;height:auto;padding:10px 0}
+  .head-right{width:100%}
+  nav{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px;width:100%}
+  nav a{margin-left:0;margin-right:18px;font-size:13px;white-space:nowrap}
+}
+
+/* Hero — großzügig, zentriert, edge-to-edge */
+.hero{display:flex;flex-direction:column;min-height:calc(100vh - 65px);padding-top:8px;position:relative;overflow:hidden}
+.hero-inner{padding:64px 0 20px;text-align:center}
+.eyebrow{font-family:var(--mono);font-size:13px;color:var(--pk-teal-deep);letter-spacing:.08em;margin-bottom:18px;display:flex;align-items:center;justify-content:center;gap:8px}
+.eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--pk-gold);display:inline-block}
+h1{font-family:var(--disp);font-weight:700;font-size:clamp(36px,6vw,76px);line-height:1.06;letter-spacing:-.02em;max-width:19ch;margin:0 auto}
+h1 .c-dot{color:var(--green)}
+h1 .pk-name{background:var(--pk-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.lead{margin:26px auto 0;font-size:clamp(17px,1.6vw,20.5px);line-height:1.7;color:var(--ink-soft);max-width:78ch;text-align:justify;text-align-last:center}
+
+/* Hero-Bildband — atmosphärisches Designelement, ca. 25% der Hero-Höhe */
+.hero-band-wrap{margin-top:auto;width:100%;height:clamp(150px,24vh,320px);position:relative;overflow:hidden;
+  -webkit-mask-image:linear-gradient(to bottom,transparent,black 18%,black 82%,transparent);
+  mask-image:linear-gradient(to bottom,transparent,black 18%,black 82%,transparent)}
+.hero-band-wrap svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+#heroBand{opacity:.88;transition:opacity .12s linear;will-change:opacity}
+
+/* Scroll-Hinweis */
+.scroll-cue{display:flex;flex-direction:column;align-items:center;gap:8px;text-decoration:none;color:var(--ink-soft);
+  padding:20px 0 30px;font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase}
+.scroll-cue:hover{color:var(--pk-teal-deep)}
+.scroll-cue .arrow{width:22px;height:22px;animation:cueBounce 2.2s ease-in-out infinite}
+@keyframes cueBounce{0%,100%{transform:translateY(0);opacity:.55}50%{transform:translateY(7px);opacity:1}}
+@media (prefers-reduced-motion:reduce){.scroll-cue .arrow{animation:none}}
+
+.btn{display:inline-block;font-family:var(--disp);font-size:15px;font-weight:500;text-decoration:none;
+  padding:12px 22px;border-radius:8px;border:1px solid var(--pk-teal-deep);cursor:pointer}
+.btn.primary{background:var(--pk-teal-deep);border-color:var(--pk-teal-deep);color:#fff}
+.btn.primary:hover{background:var(--pk-teal)}
+.btn.ghost{color:var(--pk-teal-deep);background:#fff}
+.btn.ghost:hover{background:var(--pk-gold-soft)}
+.btn.gold{background:var(--pk-gold);border-color:var(--pk-gold);color:#3a2c00}
+.btn.gold:hover{filter:brightness(1.08)}
+
+/* Stat-/Vertrauensleiste */
+.statbar{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--panel)}
+.statbar .wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:0;padding:22px 24px}
+.stat{text-align:center;padding:0 10px;border-left:1px dashed var(--line)}
+.stat:first-child{border-left:0}
+.stat .n{font-family:var(--disp);font-weight:700;font-size:clamp(22px,3vw,30px);color:var(--pk-teal-deep)}
+.stat .n.gold{color:#8a6d00}
+.stat .l{font-size:12.5px;color:var(--ink-soft);margin-top:4px}
+@media(max-width:760px){.statbar .wrap{grid-template-columns:repeat(2,1fr);row-gap:18px}.stat{border-left:0}}
+
+/* Abschnitte */
+section{padding:56px 0;border-top:1px solid var(--line)}
+.sec-eyebrow{font-family:var(--mono);font-size:13px;color:var(--pk-teal-deep);letter-spacing:.08em}
+h2{font-family:var(--disp);font-weight:700;font-size:clamp(24px,3vw,34px);margin:8px 0 14px;letter-spacing:-.01em}
+.sec-lead{color:var(--ink-soft);max-width:64ch}
+
+/* Live-Demo-Intro: exakt wie Hero-Text (Breite, Zentrierung, Blocksatz, Typografie) — wirkt "aus einem Guss" */
+#demo>.wrap>.sec-eyebrow,#demo>.wrap>h2{text-align:center}
+#demo>.wrap>.sec-lead{margin:26px auto 0;font-size:clamp(17px,1.6vw,20.5px);line-height:1.7;color:var(--ink-soft);
+  max-width:78ch;text-align:justify;text-align-last:center}
+
+/* Live-Vergleich-Intro: identisch zu Hero/Live-Demo (Breite, Zentrierung, Blocksatz, Typografie) */
+#vergleich>.wrap>.sec-eyebrow,#vergleich>.wrap>h2{text-align:center}
+#vergleich>.wrap>.sec-lead{margin:26px auto 0;font-size:clamp(17px,1.6vw,20.5px);line-height:1.7;color:var(--ink-soft);
+  max-width:78ch;text-align:justify;text-align-last:center}
+
+/* Demo */
+.demo-shell{margin-top:26px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 10px 30px rgba(20,40,20,.08)}
+.demo-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;background:var(--panel);border-bottom:1px solid var(--line)}
+.demo-steps{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font-family:var(--mono);font-size:12.5px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px;color:var(--ink-soft)}
+.chip b{color:var(--pk-teal-deep);font-weight:500}
+.demo-shell iframe{width:100%;height:640px;border:0;display:block;background:#fff}
+.demo-note{font-size:14px;color:var(--ink-soft);margin-top:12px}
+@media(max-width:900px){
+  .hero{min-height:auto}
+  .hero-inner{padding:36px 0 16px}
+  .demo-shell iframe{height:520px}
+  .demo-note .mobile-hint{display:inline}
+}
+@media(min-width:901px){
+  .demo-note .mobile-hint{display:none}
+}
+
+/* ---------------------------------------------------------- */
+/* Vergleichs-Sektion: Live-Vergleich Klassisch vs. Peacock Menu */
+/* ---------------------------------------------------------- */
+.lv-stage{margin-top:34px;display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media(max-width:900px){.lv-stage{grid-template-columns:1fr}}
+.lv-col{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 10px 30px rgba(20,40,20,.06);display:flex;flex-direction:column;position:relative}
+.lv-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line);background:var(--panel)}
+.lv-tag{font-family:var(--disp);font-weight:600;font-size:15.5px}
+.lv-col[data-side="classic"] .lv-tag{color:var(--classic)}
+.lv-col[data-side="peacock"] .lv-tag{color:var(--green-deep)}
+.lv-sub{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft)}
+.lv-canvas{position:relative;padding:14px 14px 4px}
+.lv-canvas svg{width:100%;height:auto;display:block;overflow:visible}
+.lv-elem{opacity:0;transition:opacity .16s ease}
+.lv-elem.on{opacity:1}
+.lv-cursor .tip{stroke:#fff;stroke-width:1.4;stroke-linejoin:round}
+.lv-col[data-side="classic"] .lv-cursor .tip{fill:var(--classic)}
+.lv-col[data-side="peacock"] .lv-cursor .tip{fill:var(--green-deep)}
+.lv-trail{fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.lv-col[data-side="classic"] .lv-trail{stroke:var(--classic)}
+.lv-col[data-side="peacock"] .lv-trail{stroke:var(--green)}
+.lv-click-ring{fill:none;stroke-width:2;opacity:0}
+.lv-col[data-side="classic"] .lv-click-ring{stroke:var(--classic)}
+.lv-col[data-side="peacock"] .lv-click-ring{stroke:var(--green)}
+.lv-click-ring.pulse{animation:lvRing .55s ease-out}
+@keyframes lvRing{0%{opacity:.85;stroke-width:7}100%{opacity:0;stroke-width:0}}
+.lv-hotspot{fill:var(--green-soft);stroke:var(--green-deep);stroke-width:1.3;stroke-dasharray:2.4 2;animation:lvHotspot 1.6s ease-in-out infinite}
+@keyframes lvHotspot{0%,100%{opacity:.55;r:4.5}50%{opacity:1;r:5.5}}
+.lv-done{position:absolute;top:14px;right:14px;font-family:var(--mono);font-size:11px;background:var(--green-deep);color:#fff;padding:4px 10px;border-radius:999px;opacity:0;transform:translateY(-4px);transition:opacity .3s ease,transform .3s ease;z-index:3}
+.lv-col[data-side="classic"] .lv-done{background:var(--classic)}
+.lv-done.show{opacity:1;transform:none}
+.lv-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line)}
+.lv-kpi{background:#fff;padding:14px 8px;text-align:center}
+.lv-kpi .v{font-family:var(--disp);font-weight:700;font-size:19px;font-variant-numeric:tabular-nums}
+.lv-kpi .v .u{font-size:11.5px;font-weight:500;color:var(--ink-soft);margin-left:1px}
+.lv-kpi .l{font-size:10.5px;color:var(--ink-soft);margin-top:3px}
+@media(max-width:520px){.lv-kpis{grid-template-columns:1fr 1fr}}
+.lv-controls{display:flex;align-items:center;gap:16px;margin-top:22px;flex-wrap:wrap}
+.lv-progress{flex:1;min-width:140px;height:5px;border-radius:999px;background:var(--panel);overflow:hidden}
+.lv-progress-bar{height:100%;width:0%;background:var(--pk-grad);border-radius:999px}
+.lv-result{margin-top:34px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,#fff,var(--panel));padding:34px 30px;opacity:0;transform:translateY(10px);transition:opacity .5s ease,transform .5s ease}
+.lv-result.show{opacity:1;transform:none}
+.lv-result-eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--pk-teal-deep);text-align:center;margin-bottom:22px}
+.lv-result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;text-align:center}
+@media(max-width:700px){.lv-result-grid{grid-template-columns:1fr}}
+.lv-result-card{padding:6px 10px}
+.lv-result-card .ic{width:32px;height:32px;margin:0 auto 12px;color:var(--pk-teal-deep)}
+.lv-result-card.gold .ic{color:var(--pk-gold)}
+.lv-result-card .n{font-family:var(--disp);font-weight:700;font-size:clamp(32px,4.4vw,44px);color:var(--pk-teal-deep);line-height:1}
+.lv-result-card.gold .n{color:#9c7b0e}
+.lv-result-card .l{font-size:13.5px;color:var(--ink-soft);margin-top:8px}
+.lv-business{margin-top:34px;border:1px solid var(--line);border-radius:14px;padding:30px;background:#fff}
+.lv-business h3{font-family:var(--disp);font-size:18px;margin:0 0 8px}
+.lv-biz-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+@media(max-width:600px){.lv-biz-grid{grid-template-columns:1fr}}
+.lv-biz-card{border:1px solid var(--line);border-radius:10px;padding:16px;text-align:center;background:var(--panel)}
+.lv-biz-card .n{font-family:var(--disp);font-weight:700;font-size:25px;color:var(--pk-teal-deep)}
+.lv-biz-card .l{font-size:11.5px;color:var(--ink-soft);margin-top:4px}
+.lv-shot{margin:0;padding:12px 12px 6px}
+.lv-shot img{width:100%;display:block;border:1px solid var(--line);border-radius:8px}
+.lv-repro{margin-top:14px;text-align:center;font-size:13.5px;color:var(--ink-soft)}
+.lv-step-label{padding:0 14px 12px;font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);min-height:16px}
+
+/* Mechanismus */
+.mech{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:30px}
+@media(max-width:820px){.mech{grid-template-columns:1fr}}
+.mech .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:22px}
+.mech .ref{font-family:var(--mono);font-size:12px;color:var(--pk-teal-deep)}
+.mech h3{font-family:var(--disp);font-size:19px;margin:6px 0 8px}
+.mech p{font-size:15.5px;color:var(--ink-soft)}
+blockquote{margin-top:30px;border-left:3px solid var(--green);background:var(--green-soft);padding:16px 20px;border-radius:0 8px 8px 0;font-size:16px}
+blockquote .src{display:block;font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-top:8px}
+blockquote.pk{border-left-color:var(--pk-teal-deep);background:var(--pk-gold-soft)}
+
+/* RSI / Gesundheit */
+.rsi-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:36px;margin-top:8px;align-items:start}
+@media(max-width:900px){.rsi-grid{grid-template-columns:1fr}}
+.rsi-grid h3{font-family:var(--disp);font-size:17px;margin:22px 0 8px}
+.rsi-grid h3:first-child{margin-top:0}
+.rsi-grid p{color:var(--ink-soft);font-size:15.5px}
+.rsi-side{border:1px solid var(--line);border-radius:12px;padding:22px;background:var(--panel);position:sticky;top:80px}
+.rsi-side h4{font-family:var(--disp);font-size:15.5px;margin-bottom:10px}
+.rsi-calc label{display:block;font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-bottom:6px}
+.rsi-calc input[type="range"]{width:100%;accent-color:var(--pk-teal-deep)}
+.rsi-calc .val{font-family:var(--mono);font-size:13px;color:var(--ink);margin-bottom:14px}
+.rsi-result{margin-top:14px;padding:14px;background:#fff;border:1px solid var(--line);border-radius:8px}
+.rsi-result .n{font-family:var(--disp);font-weight:700;font-size:24px;color:var(--pk-teal-deep)}
+.rsi-result .l{font-size:12.5px;color:var(--ink-soft)}
+.disclaimer{margin-top:16px;font-size:12px;color:var(--ink-soft);border-top:1px dashed var(--line);padding-top:12px}
+.rsi-icon{width:100%;max-width:220px;display:block;margin:0 auto 18px}
+
+/* Patentfakten */
+.facts{margin-top:26px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.facts .row{display:grid;grid-template-columns:230px 1fr;border-top:1px solid var(--line)}
+.facts .row:first-child{border-top:0}
+.facts .k{font-family:var(--mono);font-size:13px;color:var(--ink-soft);padding:13px 16px;background:var(--panel)}
+.facts .v{padding:13px 16px;font-size:15.5px}
+@media(max-width:640px){.facts .row{grid-template-columns:1fr}.facts .k{padding-bottom:2px}}
+
+.claims{margin-top:18px;border:1px solid var(--line);border-radius:10px;background:#fff;overflow:hidden}
+.claims summary{cursor:pointer;list-style:none;padding:14px 18px;font-family:var(--disp);font-size:15px;display:flex;align-items:center;justify-content:space-between;background:var(--panel)}
+.claims summary::-webkit-details-marker{display:none}
+.claims summary::after{content:"+";font-family:var(--mono);font-size:18px;color:var(--pk-teal-deep)}
+.claims[open] summary::after{content:"–"}
+.claims table{width:100%;border-collapse:collapse}
+.claims td{padding:9px 18px;font-size:14px;border-top:1px solid var(--line);vertical-align:top}
+.claims td:first-child{font-family:var(--mono);color:var(--pk-teal-deep);white-space:nowrap;width:70px}
+
+/* Investoren-Callout */
+.invest{margin-top:28px;border:1px solid var(--line);border-radius:12px;padding:26px;background:var(--pk-grad);color:#fff}
+.invest h3{font-family:var(--disp);font-size:20px;margin-bottom:10px}
+.invest p{opacity:.92;max-width:70ch}
+.invest-points{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.invest-points span{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:5px 12px}
+
+/* Kontakt / Footer */
+.contact-grid{display:flex;flex-wrap:wrap;gap:22px;margin-top:26px}
+.contact-grid .c{flex:0 1 auto;border:1px solid var(--line);border-radius:10px;padding:22px 26px;background:#fff}
+.contact-grid .role{font-family:var(--mono);font-size:12px;color:var(--pk-teal-deep);letter-spacing:.06em}
+.contact-grid h3{font-family:var(--disp);font-size:19px;margin:6px 0 4px}
+.contact-grid p{font-size:15px;color:var(--ink-soft)}
+footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:13.5px;color:var(--ink-soft)}
+footer .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.mono{font-family:var(--mono)}
+</style>
+</head>
+<body>
+
+<!-- Wiederverwendbares Peacock-Menu-Logo (einmal definiert, per <use> referenziert) -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <radialGradient id="pkEyeGrad" cx="46%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#f5e6b8"/>
+      <stop offset="28%" stop-color="var(--green)"/>
+      <stop offset="60%" stop-color="var(--pk-teal)"/>
+      <stop offset="100%" stop-color="var(--pk-teal-deep)"/>
+    </radialGradient>
+    <symbol id="peacockMark" viewBox="0 0 64 64">
+      <g stroke="url(#pkEyeGrad)" stroke-width="2.2" fill="none" stroke-linecap="round" opacity=".55">
+        <path d="M32 60 C 19 47, 13 29, 17 8"/>
+        <path d="M32 60 C 26 45, 24 26, 27 4"/>
+        <path d="M32 60 C 32 43, 32 23, 32 2"/>
+        <path d="M32 60 C 38 45, 40 26, 37 4"/>
+        <path d="M32 60 C 45 47, 51 29, 47 8"/>
+      </g>
+      <ellipse cx="32" cy="27" rx="15.5" ry="19.5" fill="url(#pkEyeGrad)"/>
+      <ellipse cx="32" cy="27" rx="9.5" ry="12.5" fill="#0a2e2b"/>
+      <ellipse cx="32" cy="25" rx="4" ry="5.6" fill="var(--green)"/>
+      <circle cx="32" cy="21.5" r="1.6" fill="#f5e6b8"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header>
+  <div class="wrap head">
+    <a class="brand" href="#top">
+      <svg class="logo-mark" viewBox="0 0 64 64" aria-hidden="true"><use href="#peacockMark"/></svg>
+      <span class="brand-word"><b>Peacock</b> Menu</span>
+    </a>
+    <div class="head-right">
+      <nav>
+        <!-- ✏️ 04 · Navigationslinks (nur Text ändern, nicht die #-Anker) -->
+        <a href="#demo">Live-Demo</a>
+        <a href="#vergleich">Vergleich</a>
+        <a href="#gesundheit">Gesundheit</a>
+        <a href="#patent">Patent</a>
+        <a href="#kontakt">Kontakt</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero" id="heroSection">
+    <div class="wrap-hero hero-inner">
+      <!-- ✏️ 05 · Hero-Eyebrow (kleine Zeile über der Überschrift) -->
+      <div class="eyebrow"><span class="dot"></span>EINE NEUE ART, MENÜS ZU DENKEN</div>
+      <!-- ✏️ 06 · Hero-Überschrift (H1) -->
+      <h1><span class="pk-name">Peacock Menu</span>: Jede Menüebene öffnet sich exakt dort, wo Sie sie brauchen<span class="c-dot">.</span></h1>
+      <!-- ✏️ 07 · Hero-Einleitungstext -->
+      <p class="lead">Peacock Menu bringt jede Menüebene automatisch dorthin, wo Ihr Cursor bereits steht. Sobald Sie einen Eintrag wählen, wird genau dieser Punkt zum neuen Ausgangspunkt der nächsten Ebene — die verfügbaren Optionen fächern sich unmittelbar um ihn herum auf, wie die Augen einer Pfauenfeder. Das Ergebnis ist eine durchgehend flüssige, schnelle und intuitive Navigation, die in unabhängigen Vergleichsszenarien bis zu 25–33&nbsp;% weniger Zeigerbewegungen benötigt als klassische Dropdown-Menüs — unabhängig von der Tiefe der Menüstruktur.</p>
+    </div>
+
+    <!-- ✏️ 08 · Atmosphärisches Hero-Bildband (Peacock-Illustration, Fade-Effekt beim Scrollen) -->
+    <div class="hero-band-wrap">
+      <svg id="heroBand" viewBox="0 0 1600 320" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="bandBg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#082f2f"/>
+            <stop offset="42%" stop-color="#0b6e6e"/>
+            <stop offset="72%" stop-color="#0E7A00"/>
+            <stop offset="100%" stop-color="#c9a227"/>
+          </linearGradient>
+          <radialGradient id="bandEye" cx="45%" cy="38%" r="65%">
+            <stop offset="0%" stop-color="#f5e6b8"/>
+            <stop offset="30%" stop-color="#18A303"/>
+            <stop offset="65%" stop-color="#0b6e6e"/>
+            <stop offset="100%" stop-color="#082f2f"/>
+          </radialGradient>
+        </defs>
+        <rect width="1600" height="320" fill="url(#bandBg)"/>
+        <g opacity=".9">
+          <ellipse cx="120" cy="230" rx="120" ry="150" fill="url(#bandEye)" opacity=".45"/>
+          <ellipse cx="340" cy="90" rx="150" ry="185" fill="url(#bandEye)" opacity=".55"/>
+          <ellipse cx="600" cy="240" rx="130" ry="160" fill="url(#bandEye)" opacity=".4"/>
+          <ellipse cx="840" cy="80" rx="165" ry="200" fill="url(#bandEye)" opacity=".6"/>
+          <ellipse cx="1100" cy="230" rx="135" ry="165" fill="url(#bandEye)" opacity=".45"/>
+          <ellipse cx="1340" cy="90" rx="150" ry="185" fill="url(#bandEye)" opacity=".55"/>
+          <ellipse cx="1560" cy="230" rx="120" ry="150" fill="url(#bandEye)" opacity=".4"/>
+        </g>
+      </svg>
+    </div>
+
+    <a class="scroll-cue" href="#demo">
+      <span>Scrollen, um die Innovation zu entdecken</span>
+      <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15M5 13l7 7 7-7"/></svg>
+    </a>
+  </div>
+
+  <div class="statbar">
+    <div class="wrap">
+      <div class="stat"><div class="n">−33&#8201;%</div><div class="l">Zeigerbewegungen, Beispiel&nbsp;1 (Root-Menü)<br><span class="mono" style="font-size:10.5px">Quelle: DEMO V6</span></div></div>
+      <div class="stat"><div class="n">−25&#8201;%</div><div class="l">Zeigerbewegungen, Beispiel&nbsp;2 (Kontextmenü)<br><span class="mono" style="font-size:10.5px">Quelle: DEMO V6</span></div></div>
+      <div class="stat"><div class="n gold">0&#8201;px</div><div class="l">Startweg zur nächsten Ebene — Konvergenzpunkt&nbsp;C liegt am Zeiger</div></div>
+      <div class="stat"><div class="n">2×</div><div class="l">Erteilte Patente: EP&nbsp;2616913&nbsp;B1 (2014) &amp; US&nbsp;8,756,529&nbsp;B2 (2014)</div></div>
+    </div>
+  </div>
+
+  <section id="demo">
+    <div class="wrap">
+      <!-- ✏️ 10 · Demo-Abschnitt: Eyebrow + Überschrift + Einleitung -->
+      <div class="sec-eyebrow">LIVE-DEMO</div>
+      <h2>Interaktiver Prototyp mit dynamischer Menüführung</h2>
+      <p class="sec-lead">Klicken Sie auf einen beliebigen Menüpunkt, beispielsweise „Einfügen", um Peacock Menu live zu erleben. Die verfügbaren Optionen werden kontextbezogen direkt am Klickpunkt eingeblendet. Jede anschließende Auswahl definiert einen neuen Mittelpunkt, sodass sich das Menü kontinuierlich an Ihrer aktuellen Cursorposition ausrichtet und jederzeit optimal erreichbar bleibt.</p>
+      <div class="demo-shell">
+        <div class="demo-bar">
+          <div class="demo-steps">
+            <!-- ✏️ 11 · Die drei Schritt-Chips über der Demo -->
+            <span class="chip"><b>1</b>&nbsp; Menüpunkt klicken (z.&#8201;B. Einfügen)</span>
+            <span class="chip"><b>2</b>&nbsp; Eintrag oder Arm wählen</span>
+            <span class="chip"><b>3</b>&nbsp; „(Weitere Einträge)" blättert</span>
+          </div>
+          <a class="btn ghost demo-fullscreen" href="demo.html" target="_blank" rel="noopener" style="padding:7px 14px;font-size:13.5px">Vollbild ↗</a>
+        </div>
+        <iframe id="demoFrame" src="demo.html" title="Interaktiver Klickdummy: Peacock-Menu-Navigation in LibreOffice Calc" loading="lazy"></iframe>
+      </div>
+      <!-- ✏️ 12 · Hinweistext unter der Demo -->
+      <p class="demo-note">Prototyp (Klickdummy) zur Verfahrensdemonstration — keine LibreOffice-Software. Am besten mit Maus am Desktop erleben.<span class="mobile-hint"> Auf Mobilgeräten empfiehlt sich die Vollbild-Ansicht im Querformat.</span></p>
+    </div>
+  </section>
+  <section id="vergleich">
+    <div class="wrap reveal">
+      <!-- ✏️ 13 · Vergleichs-Abschnitt: Eyebrow + Überschrift + Einleitung (Hero-Stil: zentriert, Blocksatz) -->
+      <div class="sec-eyebrow">LIVE-VERGLEICH</div>
+      <h2>Ein Klick, ein sichtbarer Unterschied</h2>
+      <p class="sec-lead">Zwei Aufzeichnungen aus dem interaktiven Prototyp zeigen denselben Navigationsvorgang — einmal mit klassischer Kaskadennavigation, einmal mit Peacock Menu, jeweils mit nummeriertem Mausweg und Messpanel. Sie zeigen, wie viel unnötige Mausbewegung, Zeit und Aufmerksamkeit das patentierte Verfahren einspart: schnellere Navigation in komplexen Anwendungen, spürbar höhere Produktivität bei wiederkehrenden Arbeitsschritten und eine geringere Belastung für Hand und Handgelenk.</p>
+
+      <div class="lv-stage">
+        <!-- Klassische Navigation: Aufzeichnung aus dem Prototyp (▶ Play, Reiter-Szenario) -->
+        <div class="lv-col" data-side="classic">
+          <div class="lv-head">
+            <span class="lv-tag">Klassische Navigation</span>
+            <span class="lv-sub">Kaskaden-Dropdown</span>
+          </div>
+          <figure class="lv-shot">
+            <img src="assets/vergleich-klassisch.png" alt="Aufzeichnung aus dem Prototyp: klassische Kaskadennavigation Einfügen, Diagramm, Säule, Gestapelt — langer, nummerierter Mausweg durch drei Untermenüs" loading="lazy">
+          </figure>
+          <div class="lv-step-label">Gemessener Mausweg: <b>534&#8201;px</b> · 4 Klicks — Einfügen &#8594; Diagramm &#8594; Säule &#8594; Gestapelt</div>
+        </div>
+        <!-- Peacock Menu: identischer Vorgang, Klicks am Armanfang nahe dem Konvergenzpunkt -->
+        <div class="lv-col" data-side="peacock">
+          <div class="lv-head">
+            <span class="lv-tag">Peacock Menu</span>
+            <span class="lv-sub">Patentierte Navigation</span>
+          </div>
+          <figure class="lv-shot">
+            <img src="assets/vergleich-peacock.png" alt="Aufzeichnung aus dem Prototyp: Peacock Menu, identischer Vorgang — jede Ebene öffnet exakt am Klickpunkt, minimaler Mausweg, Messpanel zeigt 90 Prozent Ersparnis" loading="lazy">
+          </figure>
+          <div class="lv-step-label">Gemessener Mausweg: <b>54&#8201;px</b> · 4 Klicks — identischer Vorgang, Klicks am Armanfang</div>
+        </div>
+      </div>
+      <p class="lv-repro">Echte Aufzeichnungen aus dem interaktiven Prototyp — jederzeit selbst reproduzierbar über <b>&#9654; Play</b> im Vergleichspanel der <a href="#demo">Live-Demo</a>.</p>
+
+      <!-- Ergebnis: nach Ablauf beider Animationen live berechnet eingeblendet — nur Kennzahlen, kein Fließtext -->
+      <div class="lv-result" id="lvResult">
+        <div class="lv-result-eyebrow">Im Prototyp gemessen · identischer Vorgang in beiden Modi</div>
+        <div class="lv-result-grid">
+          <div class="lv-result-card">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6l7 7 4-4 7 7M21 12v4h-4"/></svg>
+            <div class="n" id="resPath">–</div>
+            <div class="l">weniger Mausweg</div>
+          </div>
+          <div class="lv-result-card">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3L4 14h7l-1 7 9-11h-7l1-7z"/></svg>
+            <div class="n" id="resTime">–</div>
+            <div class="l">schnellere Navigation</div>
+          </div>
+          <div class="lv-result-card gold">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V10M9.5 2.5h5M12 2.5v2.2"/></svg>
+            <div class="n" id="resSaved">–</div>
+            <div class="l">Zeitersparnis je Vorgang</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Business Case: Hochrechnung auf Basis der oben live gemessenen Zeitersparnis -->
+      <div class="lv-business">
+        <h3>Was bedeutet das für Ihren Arbeitstag?</h3>
+        <p class="sec-lead" style="max-width:none;text-align:left">Ein Navigationsvorgang beschreibt die vollständige Auswahl eines Zielbefehls innerhalb einer mehrstufigen Menüstruktur — zum Beispiel den oben demonstrierten Weg von „Insert“ über „Filter“ und „Color“ bis „Blue“. Dieselbe, oben live gemessene Zeitersparnis pro Vorgang summiert sich über den Arbeitstag, die Woche und das Jahr. Stellen Sie ein, wie viele vergleichbare Navigationsvorgänge in Ihrer Anwendung typischerweise pro Tag anfallen:</p>
+        <div class="rsi-calc">
+          <label for="lvRange">Vergleichbare Navigationsvorgänge pro Arbeitstag</label>
+          <input type="range" id="lvRange" min="50" max="1500" step="10" value="400">
+          <div class="val"><span id="lvRangeVal">400</span> Vorgänge/Tag</div>
+        </div>
+        <div class="lv-biz-grid">
+          <div class="lv-biz-card"><div class="n" id="lvDaily">–</div><div class="l">Minuten/Tag</div></div>
+          <div class="lv-biz-card"><div class="n" id="lvWeekly">–</div><div class="l">Stunden/Woche</div></div>
+          <div class="lv-biz-card"><div class="n" id="lvYearly">–</div><div class="l">Stunden/Jahr</div></div>
+        </div>
+        <div class="disclaimer">Hochrechnung = eingestellte Vorgänge/Tag × oben live gemessene Zeitersparnis je Vorgang (<span id="lvPerOp">–</span>) × 5 Arbeitstage/Woche × 47 Arbeitswochen/Jahr. Grundlage ist der oben gezeigte, im interaktiven Prototyp gemessene Beispielvorgang (Einfügen &#8594; Diagramm &#8594; Säule &#8594; Gestapelt) — über &#9654; Play jederzeit selbst reproduzierbar.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="mechanismus">
+    <div class="wrap reveal">
+      <!-- ✏️ 15 · Mechanismus-Abschnitt: Eyebrow + Überschrift -->
+      <div class="sec-eyebrow">DER MECHANISMUS</div>
+      <h2>Drei Regeln, ein Prinzip — die Peacock-Menu-Logik</h2>
+      <div class="mech">
+        <div class="card">
+          <!-- ✏️ 16 · Karte 1 (Referenz / Titel / Text) -->
+          <div class="ref">ANSPRUCH 1</div>
+          <h3>Intuitive Auswahl durch Peacock-Elemente</h3>
+          <p>Die Menüpunkte erscheinen als beschriftete Sprechblasen, die über einen Führungsarm mit dem aktuellen Fokuspunkt verbunden sind — wie die Augen einer Pfauenfeder. Blase und Führungsarm reagieren gleichermaßen auf Klicks, wodurch sich die nutzbare Interaktionsfläche vergrößert.</p>
+        </div>
+        <div class="card">
+          <!-- ✏️ 17 · Karte 2 (Referenz / Titel / Text) -->
+          <div class="ref">ANSPRUCH 1 · KENNZEICHEN</div>
+          <h3>Intelligente Ausrichtung auf den letzten Auswahlpunkt</h3>
+          <p>Jede neue Menüebene orientiert sich automatisch am zuvor ausgewählten Element. Die Führungsarme aller untergeordneten Einträge laufen auf diesen Punkt zusammen, sodass der nächste Interaktionsbereich genau dort entsteht, wo sich der Mauszeiger nach der Auswahl bereits befindet.</p>
+        </div>
+        <div class="card">
+          <!-- ✏️ 18 · Karte 3 (Referenz / Titel / Text) -->
+          <div class="ref">ANSPRÜCHE 7 · 13</div>
+          <h3>Optimale Nutzung des verfügbaren Raums</h3>
+          <p>Die Positionierung der Menüpunkte passt sich automatisch an die Anzahl der verfügbaren Einträge sowie den freien Bildschirmbereich an. Reicht der Platz nicht für alle Einträge, übernimmt ein Platzhalter-Element (Bezugszeichen 721) die restlichen Optionen.</p>
+        </div>
+      </div>
+      <!-- ✏️ 19 · Zitat aus der Patentschrift + Quellenangabe -->
+      <blockquote>
+        „… der Sprechblasen-Arm eines jeden Elements der Untermenüliste verbindet das Element der Untermenüliste mit dem zuvor gewählten Element der Menüelementliste."
+        <span class="src">EP 2 616 913 B1, Anspruch 1 (kennzeichnender Teil) — Grundprinzip von Peacock Menu</span>
+      </blockquote>
+    </div>
+  </section>
+
+  <section id="gesundheit">
+    <div class="wrap reveal">
+      <!-- ✏️ 21 · Gesundheits-Abschnitt: Eyebrow + Überschrift -->
+      <div class="sec-eyebrow">ERGONOMIE &amp; GESUNDHEIT</div>
+      <h2>Weniger Zeigerweg, weniger Belastung: RSI im Blick</h2>
+      <div class="rsi-grid">
+        <div>
+          <p class="sec-lead" style="max-width:none">Schon die Patentschrift selbst benennt das Problem, das Peacock Menu adressiert — als Ausgangspunkt der Erfindung, nicht als nachträgliches Marketingargument:</p>
+          <blockquote class="pk">
+            „… the user can suffer a loss of time and stress to his/her wrist from repetitive strain."
+            <span class="src">US 8,756,529 B2, Hintergrund der Erfindung („Background of the Invention")</span>
+          </blockquote>
+
+          <h3>Was ist RSI?</h3>
+          <p>„Repetitive Strain Injury" bzw. „Repetitive Strain Syndrome" (RSI) ist ein Sammelbegriff für Beschwerden an Muskeln, Sehnen und Nerven, die durch häufig wiederholte, oft kleinräumige Bewegungen entstehen können — etwa Überlastungsreaktionen an Hand, Handgelenk, Unterarm oder Schulter. Typische Risikofaktoren sind hohe Wiederholungsraten, ungünstige Gelenkstellungen und zu geringe Erholungspausen zwischen den Bewegungen — Faktoren, die in der arbeitsmedizinischen Literatur zur Bildschirmarbeit seit Langem beschrieben werden.</p>
+
+          <h3>Wie tragen Mausbewegungen dazu bei?</h3>
+          <p>Jeder Klick in einem tief verschachtelten Dropdown-Menü erzwingt eine erneute, oft weite Zeigerbewegung — über den Tag summiert sich das bei intensiver Bildschirmarbeit zu einer erheblichen Zahl kleinteiliger, sich wiederholender Handgelenksbewegungen. Genau diesen Effekt beschreibt die Patentschrift als Ausgangsproblem klassischer, linear angeordneter Menülisten.</p>
+
+          <h3>Der strukturelle Ansatz von Peacock Menu</h3>
+          <p>Peacock Menu setzt nicht an der Behandlung, sondern an der Ursache an: Weil jede Menüebene am zuletzt gewählten Punkt konvergiert, verkürzt sich die pro Interaktion nötige Zeigerbewegung strukturell — in den DEMO-V6-Referenzszenarien um 25–33&nbsp;%. Weniger und kürzere Zeigerbewegungen pro Interaktion sind einer der allgemein anerkannten Stellhebel in der Bildschirmarbeitsplatz-Ergonomie.</p>
+
+          <div class="disclaimer">Hinweis: Peacock Menu ist eine Software-Menünavigation, kein Medizinprodukt, und die obigen Ausführungen sind keine medizinische Beratung oder Wirksamkeitsaussage. Sie ordnen den im Patent beschriebenen und in DEMO&nbsp;V6 gemessenen Effekt (reduzierte Zeigerbewegung) lediglich in den allgemein anerkannten ergonomischen Kontext ein. Bei anhaltenden Beschwerden empfiehlt sich fachärztlicher oder arbeitsmedizinischer Rat.</div>
+        </div>
+
+        <aside class="rsi-side">
+          <svg class="rsi-icon" viewBox="0 0 64 64" aria-hidden="true"><use href="#peacockMark"/></svg>
+          <h4>Ihre persönliche Hochrechnung</h4>
+          <div class="rsi-calc">
+            <label for="rsiRange">Menü-Interaktionen pro Arbeitstag</label>
+            <input type="range" id="rsiRange" min="50" max="1500" step="10" value="400">
+            <div class="val"><span id="rsiVal">400</span> Interaktionen/Tag</div>
+            <div class="rsi-result">
+              <div class="n"><span id="rsiSaved">116</span></div>
+              <div class="l">weniger Zeigerbewegungs-Segmente pro Tag (Ø −29&#8201;% je Interaktion, Basis: DEMO V6)</div>
+            </div>
+          </div>
+          <div class="disclaimer" style="margin-top:12px">Hochrechnung auf Basis der in DEMO&nbsp;V6 gemessenen relativen Reduktion der Zeigerbewegungen — keine physikalische Wegstrecken- oder Zeitmessung realer Nutzer.</div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section id="patent">
+    <div class="wrap reveal">
+      <!-- ✏️ 22 · Patent-Abschnitt: Eyebrow + Überschrift -->
+      <div class="sec-eyebrow">SCHUTZRECHT</div>
+      <h2>Patentfakten</h2>
+      <!-- ✏️ 23 · Patent-Fakten-Tabelle (jeweils Bezeichnung .k und Wert .v) -->
+      <div class="facts">
+        <div class="row"><div class="k">Veröffentlichungsnr. (EP)</div><div class="v mono">EP 2 616 913 B1</div></div>
+        <div class="row"><div class="k">Veröffentlichungsnr. (US)</div><div class="v mono">US 8,756,529 B2</div></div>
+        <div class="row"><div class="k">Titel (EN)</div><div class="v">Method and Program for Menu Tree Visualisation and Navigation</div></div>
+        <div class="row"><div class="k">Titel (DE)</div><div class="v">Verfahren und Programm für die Ansicht von Menübäumen und die Navigation durch Menübäume</div></div>
+        <div class="row"><div class="k">Inhaber &amp; Erfinder</div><div class="v">Dr. Kay Dirk Ullmann, Frankfurt am Main (DE)</div></div>
+        <div class="row"><div class="k">Erteilung</div><div class="v">EP: 02.07.2014 (Bulletin 2014/27) · US: 17.06.2014</div></div>
+        <div class="row"><div class="k">Int. Klassifikation</div><div class="v mono">G06F 3/0482</div></div>
+        <div class="row"><div class="k">PCT / WO</div><div class="v mono">PCT/EP2011/060724 · WO 2012/034726</div></div>
+        <div class="row"><div class="k">Produktmarke</div><div class="v">Peacock Menu™ — Handelsname für das patentierte Call-out-Verfahren, geführt von SolveTrail GbR als Entwicklungspartner.</div></div>
+        <div class="row"><div class="k">Gegenstand</div><div class="v">Das Patent schützt den Verhaltensmechanismus (wandernder Konvergenzpunkt C, Auswahl über Arm oder Blase, raumabhängige Anordnung, Platzhalter bei Überlauf) — nicht einzelne Maße oder Stile. Konkrete Größen sind der Implementierung überlassen.</div></div>
+      </div>
+
+      <details class="claims">
+        <summary>Anspruchsübersicht (1–15) anzeigen</summary>
+        <table>
+          <tr><td>1</td><td>Verfahren; Kennzeichen: Kind-Arm verbindet Untermenü-Eintrag mit dem gewählten Eltern-Eintrag; Auswahl über Arm/Blase</td></tr>
+          <tr><td>2</td><td>Referenzpunkt = Root-Menüeintrag oder kontextabhängiger Punkt</td></tr>
+          <tr><td>3</td><td>Auswahl per Zeigevorrichtung und/oder Tastatur</td></tr>
+          <tr><td>4</td><td>Anordnung: Linie, Kaskade, Doppelkaskade, umgedrehte Pyramide, Fächer, Bogen</td></tr>
+          <tr><td>5</td><td>Funktion = Anwendung starten, Pop-up öffnen oder weiteres Call-out anzeigen</td></tr>
+          <tr><td>6</td><td>Sprechblase enthält Textlabel und/oder Symbol</td></tr>
+          <tr><td>7</td><td>Prozessor berechnet Position aus Anzahl, freiem Raum und Präferenzen</td></tr>
+          <tr><td>8</td><td>Mehrere Ebenen als Sets von Call-outs darstellbar</td></tr>
+          <tr><td>9</td><td>Sofortige Verarbeitung bei Fokus auf Arm/Blase</td></tr>
+          <tr><td>10</td><td>Beschreibung beim Hover über Arm/Blase</td></tr>
+          <tr><td>11</td><td>Hervorheben bei Fokus/Hover/Auswahl</td></tr>
+          <tr><td>12</td><td>Pfad-Kollaps nach finaler Auswahl (Root/Referenzpunkt bleibt)</td></tr>
+          <tr><td>13</td><td>Platzhalter-Element (721) bei Overflow</td></tr>
+          <tr><td>14</td><td>Root als horizontal/vertikal/Kontext/Referenzpunkt</td></tr>
+          <tr><td>15</td><td>Computerprogramm-Produkt, das Anspruch 1 ausführt</td></tr>
+        </table>
+      </details>
+
+      <div class="invest reveal">
+        <h3>Für Investoren &amp; Lizenznehmer</h3>
+        <p>Peacock Menu basiert auf zwei bereits erteilten Patenten in zwei Kernmärkten, einem funktionsfähigen Prototyp und einer im Quelldokument selbst nachgewiesenen Effizienzsteigerung. Der Mechanismus ist anwendungsunabhängig und lässt sich in praktisch jede GUI mit mehrstufigen Menüs integrieren.</p>
+        <div class="invest-points">
+          <span>✓ EP 2 616 913 B1 erteilt (2014)</span>
+          <span>✓ US 8,756,529 B2 erteilt (2014)</span>
+          <span>✓ 15 Patentansprüche</span>
+          <span>✓ Funktionsfähiger Klickdummy</span>
+          <span>✓ −25–33 % Zeigerbewegungen nachgewiesen</span>
+          <span>✓ Plattform- &amp; branchenunabhängig</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="kontakt">
+    <div class="wrap reveal">
+      <!-- ✏️ 24 · Kontakt-Abschnitt: Eyebrow + Überschrift + Einleitung -->
+      <div class="sec-eyebrow">LIZENZIERUNG &amp; INTEGRATION</div>
+      <h2>Gespräch aufnehmen</h2>
+      <p class="sec-lead">Der gezeigte Prototyp demonstriert Peacock Menu im LibreOffice-Calc-Kontext. Für Fragen zu Lizenzierung, Integration oder Investment in die Weiterentwicklung nehmen Sie gern Kontakt auf.</p>
+      <div class="contact-grid">
+        <div class="c">
+          <!-- ✏️ 25 · Kontaktkarte 1 (Rolle / Name / Ort) -->
+          <div class="role">PATENTINHABER</div>
+          <h3>Dr. Kay Dirk Ullmann</h3>
+          <p>Frankfurt am Main</p>
+        </div>
+        <div class="c">
+          <!-- ✏️ 26 · Kontaktkarte 2 (Rolle / Name / Beschreibung) -->
+          <div class="role">ENTWICKLUNGSPARTNER</div>
+          <h3>SolveTrail GbR</h3>
+          <p>Prototyping &amp; Softwareentwicklung</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <!-- ✏️ 27 · Fußzeile links + rechts -->
+    <div>© 2026 Dr. Kay Dirk Ullmann · SolveTrail GbR · Peacock Menu™</div>
+    <div class="mono">EP 2 616 913 B1 · US 8,756,529 B2 · Klickdummy: Verfahrensdemonstration, keine LibreOffice-Software</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* Scroll-Reveal */
+  var revealEls = document.querySelectorAll(".reveal");
+  if("IntersectionObserver" in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, {threshold:.12});
+    revealEls.forEach(function(el){ io.observe(el); });
+  } else {
+    revealEls.forEach(function(el){ el.classList.add("in"); });
+  }
+
+  /* Vergleich: feste, im Prototyp gemessene Werte (Play-Ablauf, Reiter-Szenario:
+     Klassisch 534 px vs. Peacock Menu 54 px Mausweg; Zeit manuell gemessen 2,3 s vs. 1,6 s) */
+  (function(){
+    var PATH_RED = 90;      // % weniger Mausweg
+    var TIME_RED = 30;      // % schnellere Navigation
+    var SAVED_S  = 0.7;     // Sekunden Ersparnis je Vorgang
+    var el = function(id){ return document.getElementById(id); };
+    if(el("resPath"))  el("resPath").textContent  = "\u2212" + PATH_RED + " %";
+    if(el("resTime"))  el("resTime").textContent  = "\u2212" + TIME_RED + " %";
+    if(el("resSaved")) el("resSaved").textContent = "0,7 s";
+    if(el("lvPerOp"))  el("lvPerOp").textContent  = "0,7 s";
+    if(el("lvResult")) el("lvResult").classList.add("show");
+    var lvRange = el("lvRange"), lvRangeVal = el("lvRangeVal");
+    function updateBusiness(){
+      if(!lvRange) return;
+      var n = parseInt(lvRange.value, 10);
+      lvRangeVal.textContent = n;
+      var dailyMin = n * SAVED_S / 60;
+      el("lvDaily").textContent  = (Math.round(dailyMin*10)/10).toLocaleString("de-DE");
+      el("lvWeekly").textContent = (Math.round(dailyMin*5/60*10)/10).toLocaleString("de-DE");
+      el("lvYearly").textContent = Math.round(dailyMin*5*47/60).toLocaleString("de-DE");
+    }
+    if(lvRange){ lvRange.addEventListener("input", updateBusiness); }
+    updateBusiness();
+  })();
+
+  /* RSI-Rechner */
+  var rsiRange = document.getElementById("rsiRange");
+  var rsiVal = document.getElementById("rsiVal");
+  var rsiSaved = document.getElementById("rsiSaved");
+  function updateRsi(){
+    var n = parseInt(rsiRange.value, 10);
+    rsiVal.textContent = n;
+    rsiSaved.textContent = Math.round(n * 0.29);
+  }
+  if(rsiRange){ rsiRange.addEventListener("input", updateRsi); updateRsi(); }
+
+  /* Hero-Bildband: kontinuierlicher Fade-Effekt beim Scrollen */
+  var heroSection = document.getElementById("heroSection");
+  var heroBand = document.getElementById("heroBand");
+  var startOpacity = .88;
+  if(heroSection && heroBand){
+    var ticking = false;
+    function updateBandFade(){
+      ticking = false;
+      var rect = heroSection.getBoundingClientRect();
+      var h = heroSection.offsetHeight || 1;
+      var progress = Math.min(Math.max(-rect.top / (h * 0.6), 0), 1);
+      heroBand.style.opacity = String(startOpacity * (1 - progress));
+    }
+    function onScroll(){
+      if(!ticking){ window.requestAnimationFrame(updateBandFade); ticking = true; }
+    }
+    window.addEventListener("scroll", onScroll, {passive:true});
+    window.addEventListener("resize", onScroll);
+    updateBandFade();
+  }
+})();
+</script>
+
+<!-- Prototyp wird als separate demo.html geladen (iframe src) -->
+
+</body>
+</html>

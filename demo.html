@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LibreOffice Calc · Peacock menu (EP 2 616 913 B1)</title>
+<style>
+:root{
+  --font:"Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,"Liberation Sans","Helvetica Neue",Arial,sans-serif;
+  --ink:#26272b; --ink-soft:#5a5f66; --line:#d3d3d3; --line-2:#c4c4c4;
+  /* LibreOffice-Grün (Calc) — färbt die Call-out-Engine */
+  --xl:#18A303; --xl-deep:#0E7A00; --xl-soft:#e7f4e3; --xl-sel:#0E7A00;
+  /* Menü-Interaktion wie echtes LibreOffice: Hover grau, Auswahl blau */
+  --hov:#e4e6e9; --hov-line:#9aa0a6; --sel:#0078d7; --sel-deep:#005a9e;
+  --paper:#ffffff; --chrome:#f3f3f3; --chrome-2:#eaeaea;
+  --grid:#dcdee1; --hdr:#eef0f2;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;overflow:hidden}
+body{font-family:var(--font);color:var(--ink);background:#dfe1e4;display:flex}
+
+/* ===== App = LibreOffice-Fenster (bildschirmfüllend) ===== */
+.app{flex:1;min-width:0;display:flex;flex-direction:column;background:#fff}
+
+/* Titelleiste */
+.titlebar{display:flex;align-items:center;gap:9px;padding:6px 12px;background:linear-gradient(#fbfbfb,#f1f1f1);
+  border-bottom:1px solid var(--line-2);color:#3c3c3c}
+.titlebar .ico{width:20px;height:20px;border-radius:4px;background:var(--xl);color:#fff;display:grid;place-items:center;
+  font-weight:800;font-size:12px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
+.titlebar .title{font-size:12.5px;font-weight:600;color:#3a3a3a}
+.titlebar .sp{flex:1}
+.titlebar .wc{display:flex;gap:16px;color:#8a8a8a;font-size:13px}
+.titlebar .wc span{width:12px;height:2px;display:inline-block}
+.titlebar .wc .wmin{background:#8a8a8a}
+.titlebar .wc .wmax{width:11px;height:11px;border:1.6px solid #8a8a8a;background:transparent;margin-top:-4px}
+.titlebar .wc .wcl{position:relative;width:12px;height:12px;margin-top:-5px}
+.titlebar .wc .wcl:before,.titlebar .wc .wcl:after{content:"";position:absolute;left:5px;top:0;width:1.6px;height:13px;background:#8a8a8a}
+.titlebar .wc .wcl:before{transform:rotate(45deg)} .titlebar .wc .wcl:after{transform:rotate(-45deg)}
+
+/* Stage = Menüleiste + Symbolleisten + Eingabezeile + Raster (Call-out öffnet hier hinein) */
+#stage{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;background:#fff}
+
+/* Menüleiste (JS füllt #tabbar mit .tab) */
+.menubar{position:relative;z-index:20;display:flex;align-items:stretch;background:var(--chrome);border-bottom:1px solid var(--line)}
+.menubar .tab{padding:5px 11px;font:400 13px var(--font);color:#2b2c30;cursor:pointer;user-select:none;border-radius:3px;margin:2px 0}
+.menubar .tab:hover{background:#dcdfe3}
+.menubar .tab.open{background:#d4e8cf;color:var(--xl-deep)}
+
+/* Symbolleisten */
+.toolbar{display:flex;align-items:center;gap:2px;padding:4px 8px;background:var(--chrome);border-bottom:1px solid var(--line)}
+.toolbar.fmt{background:#f6f6f6}
+.toolbar .i{filter:grayscale(1);opacity:.72;font-size:15px;line-height:1;width:24px;height:22px;display:grid;place-items:center;border-radius:3px;cursor:default}
+.toolbar .i:hover{background:#dcdfe3;opacity:.9}
+.toolbar .sep{width:1px;height:18px;background:var(--line-2);margin:0 5px}
+.toolbar .txtbtn{font:600 12.5px var(--font);color:#3a3a3a;width:22px;height:22px;display:grid;place-items:center;border-radius:3px;cursor:default}
+.toolbar .txtbtn:hover{background:#dcdfe3}
+.toolbar .fontname{display:flex;align-items:center;gap:8px;height:22px;padding:0 8px;min-width:150px;background:#fff;border:1px solid var(--line-2);border-radius:3px;font-size:12.5px;color:#3a3a3a}
+.toolbar .fontsize{display:flex;align-items:center;gap:8px;height:22px;padding:0 8px;width:56px;background:#fff;border:1px solid var(--line-2);border-radius:3px;font-size:12.5px;color:#3a3a3a}
+.toolbar .cbx{color:#9aa0a6;font-size:9px;margin-left:auto}
+
+/* Eingabezeile */
+.formulabar{display:flex;align-items:center;gap:6px;padding:4px 8px;background:#fff;border-bottom:1px solid var(--line)}
+.namebox{display:flex;align-items:center;gap:8px;min-width:78px;height:24px;padding:0 8px;font-size:12.5px;color:var(--ink);
+  border:1px solid var(--line-2);border-radius:3px;background:#fff}
+.namebox .nb-arrow{color:#9aa0a6;font-size:9px;margin-left:auto}
+.fbtns{display:flex;align-items:center;gap:3px;padding-right:4px;border-right:1px solid var(--line);margin-right:2px}
+.fbtns .fb{width:24px;height:22px;display:grid;place-items:center;border-radius:3px;font-size:13px;color:#5a5f66;cursor:default}
+.fbtns .fb.fx{font-style:italic;font-weight:700}
+.fbtns .fb.sig{color:var(--xl-deep);font-weight:700}
+.fbtns .fb:hover{background:#eef0f2}
+.finput{flex:1;font-size:13px;color:#3a3a3a;padding:0 4px}
+
+/* Zellraster */
+.gridwrap{position:relative;z-index:1;flex:1;min-height:0;overflow:hidden;background:#fff}
+table.grid{border-collapse:collapse;table-layout:fixed;font-size:12.5px}
+table.grid col.rowhdr{width:44px} table.grid col.cell{width:92px}
+table.grid th,table.grid td{border:1px solid var(--grid);height:22px}
+table.grid thead th{background:var(--hdr);color:#5a5f66;font-weight:600;text-align:center;height:20px}
+table.grid tbody th{background:var(--hdr);color:#5a5f66;font-weight:600;text-align:center}
+table.grid td{padding:0 6px;color:var(--ink)}
+table.grid td.num{text-align:right;font-variant-numeric:tabular-nums}
+table.grid .corner{background:#e6e8ea}
+table.grid tr.subtotal td,table.grid tr.subtotal th{font-weight:700;background:#eef4ec}
+.cellsel{outline:2px solid var(--xl-sel);outline-offset:-2px}
+
+.hint{position:absolute;left:0;right:0;top:44%;transform:translateY(-50%);text-align:center;color:#9aa0a6;font-size:13.5px;pointer-events:none;z-index:2}
+.hint b{color:var(--xl-deep)}
+
+/* ===== Klassisches LibreOffice-Menü (Vergleichsmodus) ===== */
+.cpanel{position:absolute;z-index:30;background:#fff;border:1px solid #c8c8c8;border-radius:3px;
+  box-shadow:0 4px 14px rgba(0,0,0,.18);padding:4px 0;min-width:190px;user-select:none}
+.citem{position:relative;display:flex;align-items:center;gap:8px;padding:5px 28px 5px 26px;
+  font:400 13px var(--font);color:var(--ink);white-space:nowrap;cursor:default}
+.citem:hover{background:var(--hov)}
+.citem.active{background:var(--sel);color:#fff}
+.citem .csub{position:absolute;right:10px;font-size:9px;color:#666}
+.citem.active .csub{color:#fff}
+
+/* ===== Mausweg-Trail (nummerierte Wegstrecken wie im Vergleichsdokument) ===== */
+#trailSvg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:36}
+#trailSvg .tr-line{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round;opacity:.8}
+#trailSvg .tr-dot{stroke:#fff;stroke-width:1.5}
+#trailSvg .tr-num{fill:#fff;font:600 10px var(--font);text-anchor:middle;dominant-baseline:central}
+#trailSvg .tr-live{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round;opacity:.85}
+#trailSvg .cur path{fill:#1f2733;stroke:#fff;stroke-width:1.3;stroke-linejoin:round}
+
+/* ===== Vergleichs-HUD ===== */
+#hud{position:absolute;right:14px;bottom:34px;z-index:40;width:274px;background:#fff;border:1px solid #c8c8c8;
+  border-radius:6px;box-shadow:0 6px 18px rgba(0,0,0,.16);font:400 12px var(--font);color:var(--ink);user-select:none}
+#hud .h-title{font:600 10.5px var(--font);letter-spacing:.06em;color:#5b6675;padding:8px 12px 6px}
+#hud .h-seg{display:flex;gap:0;margin:0 12px 8px;border:1px solid #c8c8c8;border-radius:5px;overflow:hidden}
+#hud .h-seg button{flex:1;border:0;background:#f4f4f4;font:400 12px var(--font);padding:5px 0;cursor:pointer;color:var(--ink)}
+#hud .h-seg button.on{background:var(--sel);color:#fff}
+#hud .h-task{padding:0 12px 7px;color:#5b6675;line-height:1.45}
+#hud .h-task b{color:var(--ink);font-weight:600}
+#hud .h-live{padding:2px 12px 7px;color:var(--ink)}
+#hud .h-live .val{font-weight:600}
+#hud .h-rows{border-top:1px dashed #d8d8d8;padding:7px 12px}
+#hud .h-row{display:flex;justify-content:space-between;gap:8px;padding:2px 0}
+#hud .h-row .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:baseline}
+#hud .h-row.classic .dot{background:#5b6675}
+#hud .h-row.callout .dot{background:var(--xl-deep)}
+#hud .h-save{border-top:1px dashed #d8d8d8;padding:7px 12px;font-weight:600}
+#hud .h-save .pos{color:var(--xl-deep)}
+#hud .h-foot{padding:0 12px 9px}
+#hud .h-foot a{color:#5b6675;font-size:11px;text-decoration:underline;cursor:pointer}
+#hud .h-play{display:flex;gap:8px;align-items:center;margin:0 12px 9px}
+#hud .h-play .h-seg{flex:1;margin:0}
+#hud .h-play .h-seg button{font-size:11.5px;padding:4px 0}
+#hud .h-btn{border:0;border-radius:5px;padding:6px 12px;font:600 12px var(--font);cursor:pointer;background:var(--sel);color:#fff;white-space:nowrap}
+#hud .h-btn:hover{background:var(--sel-deep)}
+#hud .h-btn:disabled{opacity:.55;cursor:default}
+
+#armsSvg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:30}
+
+/* Fächerrahmen: umschliessendes Panel je Ebene (Aequivalent zum Panel-Rahmen des klassischen Menüs, in Fächerform mit Spitze in C).
+   Zwei Fat-Stroke-Pfade derselben Huelle: aussen Randfarbe, innen Panelfarbe -> gepolsterter Rahmen mit runden Ecken. */
+g.frame{pointer-events:none;filter:drop-shadow(0 3px 10px rgba(20,40,20,.16))}
+g.frame .f-border{fill:#c3c9c4;stroke:#c3c9c4;stroke-linejoin:round}
+g.frame .f-fill{fill:#fafbfa;stroke:#fafbfa;stroke-linejoin:round}
+
+/* ---- Call-out (SVG) – unveränderte Fächer-Engine, LibreOffice-grün ---- */
+g.callout{cursor:pointer;pointer-events:auto;filter:drop-shadow(0 2px 4px rgba(0,0,0,.16))}
+g.callout .co-body{fill:#fff;stroke:#c7cdc9;stroke-width:1;transition:fill .12s,stroke .12s,stroke-width .12s}
+g.callout .co-label{fill:var(--ink);font:400 10.5px var(--font);pointer-events:none}
+g.callout .co-chevron{fill:#445;font-size:10px;font-weight:700;pointer-events:none}
+g.callout:not(.selected):hover .co-body,g.callout.hover:not(.selected) .co-body{fill:var(--hov);stroke:var(--hov-line);stroke-width:1}
+g.callout:not(.selected):hover .co-label,g.callout.hover:not(.selected) .co-label{fill:var(--ink)}
+g.callout:not(.selected):hover .co-chevron,g.callout.hover:not(.selected) .co-chevron{fill:#445}
+g.callout.selected .co-body{fill:var(--selfill,var(--sel));stroke:var(--selfill,var(--sel))}
+g.callout.selected .co-label{fill:var(--sellabel,#fff)}
+g.callout.selected .co-chevron{fill:var(--sellabel,#ffffff)}
+g.callout.dimmed{filter:none;opacity:var(--dimop,.42)}
+g.callout.dimmed:hover{opacity:.85}
+g.callout.dimmed .co-body{fill:#eef1f5;stroke:#dde3ea}
+g.callout.dimmed .co-label{fill:#9aa3af}
+/* "Mehr"-Pager: gestrichelt + kursiv, klar als Blätter-Element erkennbar */
+g.callout.more:not(.dimmed) .co-body{fill:#ffffff;stroke:#7e8798;stroke-dasharray:4 3;stroke-width:1.4}
+g.callout.more .co-label{font-style:italic;fill:#5b6675;font-weight:400}
+g.callout.more:not(.selected):hover .co-body,g.callout.more.hover:not(.selected) .co-body{fill:var(--hov);stroke:var(--hov-line);stroke-dasharray:4 3}
+g.callout.appear{animation:rise .18s ease both}
+@keyframes rise{from{opacity:0}to{opacity:1}}
+
+/* Blattregister */
+.sheettabs{display:flex;align-items:stretch;gap:0;background:var(--chrome);border-top:1px solid var(--line);height:26px}
+.sheettabs .navs{display:flex;align-items:center;gap:2px;padding:0 8px;color:#7a7f85;font-size:11px;border-right:1px solid var(--line)}
+.sheettabs .navs span{cursor:default;padding:0 2px}
+.sheettabs .tabs{display:flex;align-items:stretch}
+.sheettab{display:flex;align-items:center;padding:0 14px;font-size:12px;color:#5a5f66;border-right:1px solid var(--line);cursor:default}
+.sheettab.active{background:#fff;color:#2b2c30;font-weight:600;box-shadow:inset 0 2px 0 var(--xl)}
+.sheetadd{display:flex;align-items:center;padding:0 10px;color:#7a7f85;font-size:14px;cursor:default}
+
+/* Statusleiste */
+.statusbar{display:flex;align-items:center;gap:0;height:22px;padding:0 4px;background:var(--chrome-2);border-top:1px solid var(--line);font-size:11.5px;color:#5a5f66}
+.statusbar #statusbar{padding:0 8px}
+.statusbar .muted{color:#6b7076}
+.statusbar .ok{color:var(--xl-deep);font-weight:700}
+.statusbar .sp{flex:1}
+.statusbar .si{padding:0 10px;border-left:1px solid var(--line);white-space:nowrap}
+.statusbar .zoom{display:flex;align-items:center;gap:8px;padding:0 10px;border-left:1px solid var(--line)}
+.statusbar .zoom .zline{width:70px;height:3px;border-radius:2px;background:#c9ccd0;position:relative}
+.statusbar .zoom .zline:after{content:"";position:absolute;right:12px;top:-3px;width:9px;height:9px;border-radius:50%;background:#8a8f95}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="titlebar">
+    <div class="ico">◧</div>
+    <div class="title">Unbenannt 1 — LibreOffice Calc</div>
+    <div class="sp"></div>
+    <div class="wc"><span class="wmin"></span><span class="wmax"></span><span class="wcl"></span></div>
+  </div>
+
+  <div id="stage">
+    <div class="menubar" id="tabbar"></div>
+
+    <div class="toolbar std">
+      <span class="i">🗋</span><span class="i">📂</span><span class="i">💾</span>
+      <span class="sep"></span>
+      <span class="i">🖨</span><span class="i">🔎</span>
+      <span class="sep"></span>
+      <span class="i">✂️</span><span class="i">⧉</span><span class="i">📋</span>
+      <span class="sep"></span>
+      <span class="i">↶</span><span class="i">↷</span>
+      <span class="sep"></span>
+      <span class="i">⬇️</span><span class="i">⬆️</span><span class="i">🔻</span>
+      <span class="sep"></span>
+      <span class="i">📊</span><span class="i">🖼️</span><span class="i">Σ</span>
+    </div>
+
+    <div class="toolbar fmt">
+      <span class="fontname">Liberation Sans<span class="cbx">▾</span></span>
+      <span class="fontsize">10<span class="cbx">▾</span></span>
+      <span class="sep"></span>
+      <span class="txtbtn" style="font-weight:800">B</span>
+      <span class="txtbtn" style="font-style:italic">I</span>
+      <span class="txtbtn" style="text-decoration:underline">U</span>
+      <span class="sep"></span>
+      <span class="i">🎨</span><span class="i">🖌️</span>
+      <span class="sep"></span>
+      <span class="i">◧</span><span class="i">▥</span><span class="i">◨</span>
+      <span class="sep"></span>
+      <span class="i">💶</span><span class="i">％</span><span class="i">🔢</span>
+      <span class="sep"></span>
+      <span class="i">▦</span>
+    </div>
+
+    <div class="formulabar">
+      <div class="namebox">A1<span class="nb-arrow">▾</span></div>
+      <div class="fbtns"><span class="fb fx">fx</span><span class="fb sig">Σ</span><span class="fb eq">=</span></div>
+      <div class="finput">Quartalsbericht 2026</div>
+    </div>
+
+    <div class="gridwrap"><div id="sheet"></div></div>
+    <div class="hint" id="hint">Menüpunkt oben anklicken – z. B. <b>Einfügen</b> – oder Rechtsklick in eine Zelle.</div>
+
+    <svg id="armsSvg"></svg>
+    <svg id="trailSvg"></svg>
+    <div id="hud"></div>
+  </div>
+
+  <div class="sheettabs">
+    <div class="navs"><span>⏮</span><span>◀</span><span>▶</span><span>⏭</span></div>
+    <div class="tabs">
+      <span class="sheettab active">Tabelle1</span>
+      <span class="sheettab">Tabelle2</span>
+      <span class="sheettab">Tabelle3</span>
+      <span class="sheetadd">＋</span>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <span id="statusbar"></span>
+    <span class="sp"></span>
+    <span class="si">Tabelle 1 von 3</span>
+    <span class="si">Standard</span>
+    <span class="si">Deutsch (Deutschland)</span>
+    <span class="si">Durchschnitt: 197.995 €;&nbsp; Summe: 1.187.970 €</span>
+    <span class="zoom"><span class="zline"></span>100 %</span>
+  </div>
+</div>
+
+<script>
+
+(function(){
+'use strict';
+const NS='http://www.w3.org/2000/svg';
+const $=s=>document.querySelector(s);
+const stage=$('#stage'), tabbar=$('#tabbar'), armsSvg=$('#armsSvg'),
+      hintEl=$('#hint'), statusEl=$('#statusbar'), sheet=$('#sheet');
+
+/* ============================== MENÜBAUM (LibreOffice Calc) ============================== */
+const TREE = {
+  datei:{label:'Datei', children:[
+    {id:'neu',label:'Neu',ico:'🗋'},{id:'oeffnen',label:'Öffnen…',ico:'📂'},
+    {id:'zuletzt',label:'Zuletzt verwendet', children:[
+      {id:'z1',label:'Quartalsbericht 2026.ods'},{id:'z2',label:'Budget.ods'},{id:'z3',label:'Kunden.csv'}
+    ]},
+    {id:'speichern',label:'Speichern',ico:'💾'},{id:'speichernu',label:'Speichern unter…'},
+    {id:'export',label:'Exportieren', children:[
+      {id:'pdf',label:'Als PDF…'},{id:'csv',label:'Als CSV…'},{id:'xlsx',label:'Als XLSX…'}
+    ]},
+    {id:'drucken',label:'Drucken…',ico:'🖨'},{id:'beenden',label:'Beenden'}
+  ]},
+  bearbeiten:{label:'Bearbeiten', children:[
+    {id:'undo',label:'Rückgängig',ico:'↶'},{id:'redo',label:'Wiederholen',ico:'↷'},
+    {id:'cut',label:'Ausschneiden',ico:'✂'},{id:'copy',label:'Kopieren',ico:'⧉'},{id:'paste',label:'Einfügen',ico:'📋'},
+    {id:'inhalte',label:'Inhalte einfügen…', children:[
+      {id:'werte',label:'Werte'},{id:'formate',label:'Formate'},{id:'verknuepf',label:'Verknüpfen'}
+    ]},
+    {id:'suchen',label:'Suchen & Ersetzen…',ico:'🔎'}
+  ]},
+  ansicht:{label:'Ansicht', children:[
+    {id:'normal',label:'Normal'},{id:'umbruch',label:'Seitenumbruch'},
+    {id:'symbolleisten',label:'Symbolleisten', children:[
+      {id:'sl1',label:'Standard'},{id:'sl2',label:'Formatierung'},{id:'sl3',label:'Zeichnung'}
+    ]},
+    {id:'statusleiste',label:'Statusleiste'},
+    {id:'zoom',label:'Maßstab', children:[
+      {id:'z50',label:'50 %'},{id:'z100',label:'100 %'},{id:'z150',label:'150 %'},{id:'z200',label:'200 %'}
+    ]},
+    {id:'fixieren',label:'Fixieren', children:[
+      {id:'fixz',label:'Zeile fixieren'},{id:'fixs',label:'Spalte fixieren'},{id:'fixzs',label:'Zeile & Spalte'}
+    ]}
+  ]},
+  einfuegen:{label:'Einfügen', children:[
+    {id:'zellen',label:'Zellen…',ico:'▦'},
+    {id:'tabelle',label:'Tabelle…'},
+    {id:'pivot',label:'Pivot-Tabelle…',ico:'⊞'},
+    {id:'diagramm',label:'Diagramm',ico:'📊', children:[
+      {id:'saeule',label:'Säule', children:[
+        {id:'sg',label:'Gruppiert'},{id:'ss',label:'Gestapelt'},{id:'s100',label:'100 % gestapelt'},{id:'s3d',label:'3-D'}
+      ]},
+      {id:'balken',label:'Balken', children:[
+        {id:'bg',label:'Gruppiert'},{id:'bs',label:'Gestapelt'},{id:'b100',label:'100 % gestapelt'},{id:'b3d',label:'3-D'}
+      ]},
+      {id:'linie',label:'Linie', children:[
+        {id:'lg',label:'Glatt'},{id:'lp',label:'Mit Punkten'},{id:'lst',label:'Gestapelt'}
+      ]},
+      {id:'kreis',label:'Kreis', children:[
+        {id:'k2',label:'2-D'},{id:'k3',label:'3-D'},{id:'kr',label:'Ring'}
+      ]}
+    ]},
+    {id:'funktion',label:'Funktion…',ico:'ƒ'},
+    {id:'bild',label:'Bild', children:[
+      {id:'bdatei',label:'Aus Datei…'},{id:'formen',label:'Formen'},{id:'smart',label:'Fontwork'}
+    ]},
+    {id:'hyperlink',label:'Hyperlink…',ico:'🔗'},
+    {id:'sonderz',label:'Sonderzeichen…',ico:'Ω'},
+    {id:'textfeld',label:'Textfeld'},
+    {id:'anmerkung',label:'Anmerkung',ico:'💬'},
+    {id:'kopffuss',label:'Kopf-/Fußzeile…'}
+  ]},
+  format:{label:'Format', children:[
+    {id:'zellformat',label:'Zellen…', children:[
+      {id:'waehrung',label:'Währung'},{id:'prozent',label:'Prozent'},{id:'datum',label:'Datum'},{id:'text',label:'Text'}
+    ]},
+    {id:'bedingt',label:'Bedingte Formatierung', children:[
+      {id:'farbskala',label:'Farbskala'},{id:'datenbalken',label:'Datenbalken'},{id:'symbole',label:'Symbolsätze'}
+    ]},
+    {id:'spalte',label:'Spalten', children:[
+      {id:'sbreite',label:'Breite…'},{id:'sopt',label:'Optimale Breite'},{id:'sausbl',label:'Ausblenden'}
+    ]},
+    {id:'zeile',label:'Zeilen', children:[
+      {id:'zhoehe',label:'Höhe…'},{id:'zopt',label:'Optimale Höhe'},{id:'zausbl',label:'Ausblenden'}
+    ]}
+  ]},
+  vorlagen:{label:'Formatvorlagen', children:[
+    {id:'vstd',label:'Standard'},{id:'vh1',label:'Überschrift 1'},{id:'vh2',label:'Überschrift 2'},{id:'verg',label:'Ergebnis'},
+    {id:'vverwalt',label:'Vorlagen verwalten…'}
+  ]},
+  tabelle:{label:'Tabelle', children:[
+    {id:'teinf',label:'Tabelle einfügen…'},{id:'tloesch',label:'Tabelle löschen'},{id:'tumben',label:'Tabelle umbenennen…'},
+    {id:'tkopie',label:'Verschieben/Kopieren…'},
+    {id:'tzellen',label:'Zellen einfügen', children:[
+      {id:'tzu',label:'Nach unten'},{id:'tzr',label:'Nach rechts'}
+    ]}
+  ]},
+  daten:{label:'Daten', children:[
+    {id:'sortieren',label:'Sortieren…'},
+    {id:'autofilter',label:'AutoFilter'},
+    {id:'filtern',label:'Weitere Filter', children:[
+      {id:'stdfilter',label:'Standardfilter…'},{id:'erweitert',label:'Erweiterter Filter…'},{id:'loeschen',label:'Filter zurücksetzen'}
+    ]},
+    {id:'gruppierung',label:'Gruppierung', children:[
+      {id:'grpein',label:'Gruppieren…'},{id:'grpgli',label:'Gliederung'}
+    ]},
+    {id:'dpivot',label:'Pivot-Tabelle…'}
+  ]},
+  extras:{label:'Extras', children:[
+    {id:'rechtschr',label:'Rechtschreibung…'},
+    {id:'makros',label:'Makros', children:[
+      {id:'mbearb',label:'Makros bearbeiten…'},{id:'maus',label:'Makros ausführen…'}
+    ]},
+    {id:'optionen',label:'Optionen…'}
+  ]},
+  fenster:{label:'Fenster', children:[
+    {id:'fneu',label:'Neues Fenster'},{id:'fschliess',label:'Fenster schließen'},{id:'fdok',label:'Unbenannt 1 — Calc'}
+  ]},
+  hilfe:{label:'Hilfe', children:[
+    {id:'hilfe1',label:'LibreOffice-Hilfe'},{id:'hueber',label:'Über LibreOffice'}
+  ]}
+};
+const TAB_ORDER=['datei','bearbeiten','ansicht','einfuegen','format','vorlagen','tabelle','daten','extras','fenster','hilfe'];
+
+/* Kontextmenü (Rechtsklick auf eine Zelle) */
+const CTX={ label:'Kontextmenü', children:[
+  {id:'cut',label:'Ausschneiden',ico:'✂'},
+  {id:'copy',label:'Kopieren',ico:'⧉'},
+  {id:'paste',label:'Einfügen',ico:'📋'},
+  {id:'einfopt',label:'Inhalte einfügen', children:[
+    {id:'werte',label:'Werte'},{id:'formate',label:'Formate'},{id:'verknuepf',label:'Verknüpfen'}
+  ]},
+  {id:'format',label:'Zellen formatieren', children:[
+    {id:'waehrung',label:'Währung'},{id:'prozent',label:'Prozent'},{id:'datum',label:'Datum'},{id:'text',label:'Text'}
+  ]},
+  {id:'filter',label:'Filter', children:[
+    {id:'wert',label:'Nach Wert'},{id:'farbe',label:'Nach Farbe'}
+  ]},
+  {id:'kommentar',label:'Kommentar einfügen'}
+]};
+
+TAB_ORDER.forEach(id=>{
+  const t=document.createElement('div'); t.className='tab'+(id==='datei'?' file':''); t.dataset.tab=id; t.textContent=TREE[id].label;
+  t.addEventListener('click',ev=>{ ev.stopPropagation(); if(state.playing)return; onTabClick(id, toStage(ev)); });
+  tabbar.appendChild(t);
+});
+
+/* ============================== Zellraster (LibreOffice) ============================== */
+(function buildSheet(){
+  const NCOL=26, NROW=45;
+  const colName=i=>{ let s=''; i++; while(i>0){ i--; s=String.fromCharCode(65+(i%26))+s; i=Math.floor(i/26);} return s; };
+  const data=[
+    ['Region','Umsatz Q1','Umsatz Q2','Wachstum','Marge','Status'],
+    ['Nord','184.200','211.450','+14,8 %','21,4 %','aktiv'],
+    ['Süd','142.870','158.900','+11,2 %','19,8 %','aktiv'],
+    ['West','98.640','121.300','+23,0 %','24,1 %','aktiv'],
+    ['Ost','76.310','71.980','−5,7 %','17,2 %','prüfen'],
+    ['Export','53.900','67.420','+25,1 %','28,6 %','aktiv'],
+    ['Gesamt','555.920','631.050','+13,3 %','22,1 %','']
+  ];
+  let h='<table class="grid"><colgroup><col class="rowhdr">';
+  for(let c=0;c<NCOL;c++) h+='<col class="cell">';
+  h+='</colgroup><thead><tr><th class="corner"></th>';
+  for(let c=0;c<NCOL;c++) h+='<th>'+colName(c)+'</th>';
+  h+='</tr></thead><tbody>';
+  for(let r=0;r<NROW;r++){
+    const tot=r===6;
+    h+='<tr'+(tot?' class="subtotal"':'')+'><th>'+(r+1)+'</th>';
+    for(let c=0;c<NCOL;c++){
+      const v=(data[r]&&data[r][c])||'';
+      const num=(c>=1&&c<=2)&&v;
+      const sel=(r===0&&c===0)?' cellsel':'';
+      h+='<td class="'+(num?'num':'')+sel+'">'+v+'</td>';
+    }
+    h+='</tr>';
+  }
+  h+='</tbody></table>'; sheet.innerHTML=h;
+})();
+
+/* ============================== ZUSTAND ============================== */
+const state={ openTab:null, selection:[], clickC:[], hoverId:null, applied:null, ctxOpen:false, ctxC:null, playing:false, morePage:0, rootC:null };
+
+/* ============================== GEOMETRIE (unveränderte Call-out-Engine) ============================== */
+function stageRect(){ return stage.getBoundingClientRect(); }
+function toStage(ev){ const s=stageRect(); return {x:ev.clientX-s.left, y:ev.clientY-s.top}; }
+function tabAnchor(tabId){
+  const el=tabbar.querySelector('.tab[data-tab="'+tabId+'"]'); const r=el.getBoundingClientRect(), s=stageRect();
+  return { x:r.left-s.left+r.width/2, y:r.bottom-s.top+2 };
+}
+function n(v){ return v.toFixed(1); }
+
+const measureG=document.createElementNS(NS,'g');
+measureG.setAttribute('class','callout');
+measureG.setAttribute('visibility','hidden');
+armsSvg.appendChild(measureG);
+const measureText=document.createElementNS(NS,'text');
+measureText.setAttribute('class','co-label');
+measureText.setAttribute('x','-9999'); measureText.setAttribute('y','-9999');
+measureG.appendChild(measureText);
+const wcache={};
+function ensureMeasure(){ if(!measureG.isConnected) armsSvg.appendChild(measureG); }
+function labelWidth(s){ if(wcache[s]!=null)return wcache[s]; ensureMeasure(); measureText.textContent=s; const w=measureText.getBBox().width; wcache[s]=w; return w; }
+let BUBBLE_H=null; const PAD_X=5, PAD_Y=2;
+function bubbleH(){ if(BUBBLE_H==null){ ensureMeasure(); measureText.textContent='Ag'; BUBBLE_H=measureText.getBBox().height+PAD_Y*2; } return BUBBLE_H; }
+function bubbleW(label){ return labelWidth(label)+PAD_X*2; }
+function showsChevron(it){ return !!it.children; }
+function itemLabel(it){ return it.label; }
+
+const CR=6;             // Eckradius (nur wo kein Arm-Ansatz liegt)
+const ARM_T=10;         // KONSTANTE Armdicke (senkrecht zur Armachse) – ueberall gleich, gut klickbar
+const KNEE_D=24;        // Knie-Abstand zu C: bis hier volle Dicke, danach Konvergenz
+const ARM_VMAX=4;       // Sicherheitskappung: vertikaler Schnitt max. ARM_VMAX*ARM_T (nahezu senkrechte Arme)
+function calloutPath(cx,cy,w,h,C){
+  const left=cx-w/2, right=cx+w/2, top=cy-h/2, bottom=cy+h/2;
+  const r=Math.min(CR, h/2, w/2);
+  const toRight=(C.x>=cx);            // C rechts -> Arm an rechter (innerer) Kante
+  const edgeX=toRight?right:left;
+  // Band konstanter senkrechter Dicke: vertikaler Schnitt hv = ARM_T * Armlaenge / horizontaler Anteil
+  const dx=Math.max(0.5, Math.abs(C.x-edgeX)), dyv=C.y-cy;
+  const len=Math.hypot(dx,dyv);
+  let hv=ARM_T*len/dx; hv=Math.min(hv, ARM_T*ARM_VMAX);
+  // Knie: bis hierhin volle Dicke, danach symmetrische Konvergenz DIREKT in den Punkt C (kein Versatz, kein Knick)
+  const kd=Math.min(KNEE_D, 0.4*len);
+  const ux=(edgeX-C.x)/len;
+  const kx=C.x+ux*kd, kcy=C.y+((cy-C.y)*(kd/len));   // Knie-Zentrum exakt auf der Armachse
+  const kT=kcy-hv/2, kB=kcy+hv/2;
+  let eT=cy-hv/2, eB=cy+hv/2;                             // Ansatz mittig an der Innenkante
+  // Steile Arme: Ansatz wandert um die Ecke auf Ober-/Unterkante (Dicke bleibt konstant)
+  const wrapT=eT<top, wrapB=eB>bottom;
+  const xLine=(yLine,ka,ea)=>{ const s=(yLine-ka)/(ea-ka); return kx+s*(edgeX-kx); };
+  let xT=null,xB=null;
+  if(wrapT){ xT=Math.max(left+2, Math.min(right-2, xLine(top,kT,eT))); }
+  if(wrapB){ xB=Math.max(left+2, Math.min(right-2, xLine(bottom,kB,eB))); }
+  const rT=wrapT?0:Math.max(0,Math.min(r,eT-top));
+  const rB=wrapB?0:Math.max(0,Math.min(r,bottom-eB));
+  const P=[];
+  if(toRight){
+    P.push('M '+n(left+r)+' '+n(top));
+    if(wrapT){ P.push('L '+n(xT)+' '+n(top)); }
+    else { P.push('L '+n(right-rT)+' '+n(top));
+      if(rT>0) P.push('A '+n(rT)+' '+n(rT)+' 0 0 1 '+n(right)+' '+n(top+rT));
+      P.push('L '+n(right)+' '+n(eT)); }
+    P.push('L '+n(kx)+' '+n(kT));       // Knie oben
+    P.push('L '+n(C.x)+' '+n(C.y));     // SPITZE: exakter Klickpunkt
+    P.push('L '+n(kx)+' '+n(kB));       // Knie unten
+    if(wrapB){ P.push('L '+n(xB)+' '+n(bottom)); }
+    else { P.push('L '+n(right)+' '+n(eB));
+      P.push('L '+n(right)+' '+n(bottom-rB));
+      if(rB>0) P.push('A '+n(rB)+' '+n(rB)+' 0 0 1 '+n(right-rB)+' '+n(bottom)); }
+    P.push('L '+n(left+r)+' '+n(bottom));
+    P.push('A '+n(r)+' '+n(r)+' 0 0 1 '+n(left)+' '+n(bottom-r));
+    P.push('L '+n(left)+' '+n(top+r));
+    P.push('A '+n(r)+' '+n(r)+' 0 0 1 '+n(left+r)+' '+n(top));
+    P.push('Z');
+  } else {
+    P.push('M '+n(wrapT?xT:left+rT)+' '+n(top));
+    P.push('L '+n(right-r)+' '+n(top));
+    P.push('A '+n(r)+' '+n(r)+' 0 0 1 '+n(right)+' '+n(top+r));
+    P.push('L '+n(right)+' '+n(bottom-r));
+    P.push('A '+n(r)+' '+n(r)+' 0 0 1 '+n(right-r)+' '+n(bottom));
+    if(wrapB){ P.push('L '+n(xB)+' '+n(bottom)); }
+    else { P.push('L '+n(left+rB)+' '+n(bottom));
+      if(rB>0) P.push('A '+n(rB)+' '+n(rB)+' 0 0 1 '+n(left)+' '+n(bottom-rB));
+      P.push('L '+n(left)+' '+n(eB)); }
+    P.push('L '+n(kx)+' '+n(kB));       // Knie unten
+    P.push('L '+n(C.x)+' '+n(C.y));     // SPITZE: exakter Klickpunkt
+    P.push('L '+n(kx)+' '+n(kT));       // Knie oben
+    if(!wrapT){ P.push('L '+n(left)+' '+n(eT));
+      P.push('L '+n(left)+' '+n(top+rT));
+      if(rT>0) P.push('A '+n(rT)+' '+n(rT)+' 0 0 1 '+n(left+rT)+' '+n(top)); }
+    P.push('Z');
+  }
+  return P.join(' ');
+}
+
+/* Keil-Fächer (Referenzform): Treppe pro Seite, Innenkanten-Abstand oben groß, unten klein -> nahtloser Fächer */
+const MORE_CAP=6;      // feste Slot-Zahl inkl. "(Weitere Einträge)"-Platzhalter (Referenz: Element 721)
+const VALLEY_MIN=38;   // Abstand C -> Innenkante der UNTERSTEN Zeile (am nächsten an C)
+const SPREAD=74;       // zusätzlicher Abstand der OBERSTEN Zeile (weit außen)
+const FAN_P=1.5;       // Krümmung des Bogens (1=gerade Treppe, >1=nach außen gekrümmt)
+function layoutLevel(C, prevRef, items, bounds){
+  const N=items.length;
+  const H=bubbleH();
+  const widths=items.map(it=> bubbleW(itemLabel(it))+(showsChevron(it)?14:0));
+  const W=Math.max(...widths);
+  const rowH=H, drop=(prevRef?12:0);
+  const m=12;
+  const VAL_SQ=16;                                        // gestauchtes Minimal-Tal fuer enge Seiten
+  const roomL=C.x-m, roomR=bounds.w-C.x-m, needSide=W+VALLEY_MIN;
+  const out=[];
+  let vdir=+1;                                             // vertikale Fächerrichtung: +1 nach unten, -1 nach oben
+  const placeSide=(arr,side,kMax)=>{                       // side: -1 links, +1 rechts; kMax: groesste Seitenzahl der Ebene
+    if(!arr.length) return;
+    const room=(side<0?roomL:roomR);
+    const valley=Math.max(VAL_SQ, Math.min(VALLEY_MIN, room-W));     // Tal ggf. stauchen (enge Seite)
+    const spread=Math.max(0, Math.min(SPREAD, (room-W)-valley));     // Spread so weit wie Platz reicht
+    arr.forEach((it,row)=>{
+      const t = kMax>1 ? row/(kMax-1) : 0;                 // 0 (oben) .. 1 (unten) – ueber kMax: Seiten spiegeln sich
+      const off = valley + spread*Math.pow(1-t, FAN_P);    // Innenkanten-Abstand zu C (oben groß, unten klein)
+      const innerX = C.x + side*off;
+      out.push({item:it, w:W, h:H, cx:innerX + side*W/2, cy:C.y+vdir*(drop+H/2+row*rowH)});  // EINHEITLICHE Breite W (Ebenen-Maximum): Innenkante (Arm) bleibt, Außenkante gleichgezogen
+    });
+  };
+  const chooseVdir=(kMax)=>{                             // Anspruch 7: freien Raum auch vertikal auswerten
+    const yMin=(bounds.yMin!=null?bounds.yMin:0);
+    const needH=drop+kMax*rowH;
+    const roomDown=bounds.h-m-C.y, roomUp=C.y-yMin-m;
+    vdir=(roomDown>=needH)?+1:((roomUp>=needH)?-1:(roomDown>=roomUp?+1:-1));
+  };
+  if(roomL>=needSide && roomR>=needSide){
+    // klassischer Halb/Halb-Split (Reihenfolge bleibt: erste Haelfte links)
+    const half=Math.ceil(N/2), kMax=Math.max(half, N-half);
+    chooseVdir(kMax);
+    placeSide(items.slice(0,half), -1, kMax); placeSide(items.slice(half), +1, kMax);
+  } else {
+    // Eine Seite eng: bei EINHEITLICHER Breite passt entweder W (+Minimal-Tal) oder nicht
+    const tightIsL=roomL<roomR;
+    const roomT=tightIsL?roomL:roomR;
+    const kT=(W+VAL_SQ<=roomT)?Math.floor(N/2):0;        // enge Seite bekommt die kleinere Haelfte
+    if(kT>0){
+      const kW=N-kT;
+      const leftArr = tightIsL ? items.slice(0,kT) : items.slice(0,kW);   // Reihenfolge bleibt: erste Eintraege links
+      const rightArr= tightIsL ? items.slice(kT)   : items.slice(kW);
+      const kMax=Math.max(kT,kW);
+      chooseVdir(kMax);
+      placeSide(leftArr, -1, kMax);
+      placeSide(rightArr, +1, kMax);
+    } else {
+      chooseVdir(N);
+      placeSide(items, tightIsL?+1:-1, N);                 // enge Seite unbrauchbar -> einseitig
+    }
+  }
+  // Rand-Korrektur: ganze Ebene verschieben statt Einzel-Clamp (erhält Zeilenabstände); Oberkante hat Prioritaet
+  const yMin2=(bounds.yMin!=null?bounds.yMin:0);
+  const shiftDown=Math.max(0, ...out.map(p=> yMin2+p.h/2-p.cy));
+  const shiftUp=Math.max(0, ...out.map(p=> p.cy+p.h/2-(bounds.h-m)));
+  const shift=(shiftDown>0)?shiftDown:-shiftUp;
+  out.forEach(p=>{
+    p.cy+=shift;
+    p.cx=Math.max(p.w/2+m, Math.min(bounds.w-p.w/2-m, p.cx));
+  });
+  return out;
+}
+
+function activeRoot(){ if(state.ctxOpen) return CTX; if(state.openTab&&TREE[state.openTab]) return TREE[state.openTab]; return null; }
+function isOpen(){ return state.ctxOpen || !!(state.openTab&&TREE[state.openTab]); }
+
+function buildLevels(bounds){
+  const root=activeRoot(); if(!root) return [];
+  let items=root.children, C;
+  if(state.ctxOpen){ C={x:state.ctxC.x, y:state.ctxC.y}; }
+  else if(state.rootC){ C={x:state.rootC.x, y:state.rootC.y}; }
+  else { C=tabAnchor(state.openTab); const edge=4; if(C.x<55)C.x=edge; else if(C.x>bounds.w-55)C.x=bounds.w-edge; }
+  const levels=[]; let prevRef=null, depth=0;
+  while(items){
+    const selId=state.selection[depth]||null;
+    const isDeepest=!selId;                         // aktive, wählbare Ebene
+    let showItems=items;
+    if(isDeepest && items.length>MORE_CAP){
+      // Referenzverhalten (Element 721): feste MORE_CAP Slots inkl. Platzhalter; Platzhalter blättert zyklisch
+      const pageSize=MORE_CAP-1;                                  // echte Einträge je Seite
+      const numPages=Math.ceil(items.length/pageSize);
+      const page=((state.morePage%numPages)+numPages)%numPages;
+      const start=page*pageSize;
+      showItems=[{id:'__more__',label:'(Weitere Einträge '+(page+1)+'/'+numPages+')',_more:true,_page:page+1,_pages:numPages}].concat(items.slice(start,start+pageSize));
+    }
+    const placements=layoutLevel(C,prevRef,showItems,bounds);
+    levels.push({C,prevRef,placements,selectedId:selId});
+    if(!selId) break;
+    const selPlace=placements.find(p=>p.item.id===selId);
+    const selItem=selPlace?selPlace.item:null;
+    if(!selItem||!selItem.children) break;
+    prevRef=C; C=state.clickC[depth]||{x:selPlace.cx,y:selPlace.cy};
+    items=selItem.children; depth++;
+  }
+  return levels;
+}
+
+function classFor(lvl,p,li,levels,anim){
+  let c='callout'+(p.item.children?'':' leaf');
+  if(p.item._more)c+=' more';
+  if(lvl.selectedId===p.item.id)c+=' selected'; else if(lvl.selectedId)c+=' dimmed';
+  if(state.hoverId===li+':'+p.item.id)c+=' hover';
+  if(anim && li===levels.length-1 && !lvl.selectedId)c+=' appear';
+  return c;
+}
+const itemReg={};                    // li:id -> Item-Objekt (fuer mousedown-Delegation im Menueband)
+function mixWhite(hex,t){            // hex Richtung Weiss mischen (t=0..1)
+  const v=parseInt(hex.slice(1),16), r=v>>16&255, g=v>>8&255, b=v&255;
+  const m=c=>Math.round(c+(255-c)*t);
+  return 'rgb('+m(r)+','+m(g)+','+m(b)+')';
+}
+const FRAME_PAD=10;                  // Polsterung des Fächerrahmens um Bubbles/C
+function convexHull(pts){            // Andrew Monotone Chain
+  pts=pts.slice().sort((a,b)=>a.x-b.x||a.y-b.y);
+  const cross=(o,a,b)=>(a.x-o.x)*(b.y-o.y)-(a.y-o.y)*(b.x-o.x);
+  const lo=[]; for(const p of pts){ while(lo.length>=2&&cross(lo[lo.length-2],lo[lo.length-1],p)<=0)lo.pop(); lo.push(p); }
+  const hi=[]; for(let i=pts.length-1;i>=0;i--){ const p=pts[i]; while(hi.length>=2&&cross(hi[hi.length-2],hi[hi.length-1],p)<=0)hi.pop(); hi.push(p); }
+  lo.pop(); hi.pop(); return lo.concat(hi);
+}
+function drawFrames(levels){
+  levels.forEach((lvl)=>{
+    if(!lvl.placements.length) return;
+    // Huellpunkte: alle Bubble-Ecken + Spitze bei C (um FRAME_PAD Richtung Faecher versetzt,
+    // damit die gepolsterte Rahmenspitze exakt in C endet und nicht in die Menueleiste ragt)
+    const avgY=lvl.placements.reduce((a,p)=>a+p.cy,0)/lvl.placements.length;
+    const tipDir=(avgY>=lvl.C.y)?+1:-1;
+    const pts=[{x:lvl.C.x, y:lvl.C.y+tipDir*FRAME_PAD}];
+    lvl.placements.forEach(p=>{
+      const l=p.cx-p.w/2, r=p.cx+p.w/2, t=p.cy-p.h/2, b2=p.cy+p.h/2;
+      pts.push({x:l,y:t},{x:r,y:t},{x:r,y:b2},{x:l,y:b2});
+    });
+    const h=convexHull(pts);
+    const d='M '+h.map(q=>n(q.x)+' '+n(q.y)).join(' L ')+' Z';
+    const fg=document.createElementNS(NS,'g'); fg.setAttribute('class','frame');
+    const p1=document.createElementNS(NS,'path'); p1.setAttribute('d',d);
+    p1.setAttribute('class','f-border'); p1.setAttribute('stroke-width', String(2*FRAME_PAD+2));
+    const p2=document.createElementNS(NS,'path'); p2.setAttribute('d',d);
+    p2.setAttribute('class','f-fill'); p2.setAttribute('stroke-width', String(2*FRAME_PAD));
+    fg.appendChild(p1); fg.appendChild(p2);
+    armsSvg.appendChild(fg);                       // Frames zuerst -> liegen unter allen Call-outs
+  });
+}
+function drawCallout(bounds,opts){
+  for(const k in itemReg) delete itemReg[k];
+  const anim=opts.animateDeepest||false;
+  const levels=buildLevels(bounds);
+  drawFrames(levels);
+  const flat=[]; levels.forEach((lvl,li)=>lvl.placements.forEach(p=>flat.push({lvl,li,p})));
+  flat.sort((a,b)=>(a.p.cy-b.p.cy)||(a.li-b.li));
+  flat.forEach(({lvl,li,p})=>{
+    const g=document.createElementNS(NS,'g');
+    g.setAttribute('class',classFor(lvl,p,li,levels,anim));
+    g.dataset.level=li; g.dataset.id=p.item.id; itemReg[li+':'+p.item.id]=p.item;
+    if(p.item.id===lvl.selectedId){
+      // Auswahlpfad: aktuellste Auswahl kraeftig, Vorfahren stufenweise heller (18 %/Stufe, max 50 %)
+      const step=Math.max(0,(state.selection.length-1)-li);
+      const t=Math.min(0.5, step*0.18);
+      if(t>0) g.style.setProperty('--selfill', mixWhite('#0078d7', t));
+      if(step>=2) g.style.setProperty('--sellabel','var(--sel-deep)');
+    } else if(lvl.selectedId){
+      // Nicht gewaehlte Geschwister: je weiter hinter der aktiven Ebene, desto blasser
+      const dist=Math.max(1, state.selection.length-li);
+      g.style.setProperty('--dimop', String(Math.max(0.15, 0.42-0.16*(dist-1))));
+    }
+    const path=document.createElementNS(NS,'path');
+    path.setAttribute('d',calloutPath(p.cx,p.cy,p.w,p.h,lvl.C));
+    path.setAttribute('class','co-body'); g.appendChild(path);
+    g.dataset.cx=n(lvl.C.x); g.dataset.cy=n(lvl.C.y);
+    const armX=(lvl.C.x>=p.cx)?p.cx+p.w/2:p.cx-p.w/2; g.dataset.ax=n(armX); g.dataset.ay=n(p.cy);
+    const chev=showsChevron(p.item);
+    const t=document.createElementNS(NS,'text');
+    t.setAttribute('x',chev?p.cx-7:p.cx); t.setAttribute('y',p.cy);
+    t.setAttribute('text-anchor','middle'); t.setAttribute('dominant-baseline','central');
+    t.setAttribute('class','co-label'); t.textContent=itemLabel(p.item); g.appendChild(t);
+    if(chev){ const ch=document.createElementNS(NS,'text');
+      ch.setAttribute('x',p.cx+p.w/2-11); ch.setAttribute('y',p.cy+1);
+      ch.setAttribute('text-anchor','middle'); ch.setAttribute('dominant-baseline','central');
+      ch.setAttribute('class','co-chevron'); ch.textContent='\u25B6'; g.appendChild(ch); }
+    g.addEventListener('click',ev=>{ ev.stopPropagation(); onItemClick(li,p.item,toStage(ev)); });
+    g.addEventListener('mouseenter',()=>{ setHover(li,p.item);
+      // Hover-Raise nur bis an die Spitze der EIGENEN Ebene – tiefere (aktive) Ebenen behalten Prioritaet
+      const next=[...armsSvg.querySelectorAll('g.callout:not([visibility])')].find(o=>+o.dataset.level>li);
+      if(next){ if(g.nextElementSibling!==next && g!==next) armsSvg.insertBefore(g,next); }
+      else if(g!==armsSvg.lastElementChild) armsSvg.appendChild(g);
+    });
+    g.addEventListener('mouseleave',clearHover);
+    armsSvg.appendChild(g);
+  });
+  armsSvg.querySelectorAll('g.callout.selected').forEach(g=>armsSvg.appendChild(g));
+  if(levels.length){ const d=levels.length-1;
+    armsSvg.querySelectorAll('g.callout[data-level="'+d+'"]').forEach(g=>armsSvg.appendChild(g)); }
+}
+
+/* ============================== INTERAKTION + STATUS ============================== */
+function render(opts){ opts=opts||{};
+  const s=stageRect(), tb=tabbar.getBoundingClientRect(), bounds={w:s.width,h:s.height,yMin:tb.bottom-s.top+2};
+  [...armsSvg.querySelectorAll('g.callout,g.frame')].forEach(e=>e.remove());
+  if(isOpen()) drawCallout(bounds,opts);
+  tabbar.querySelectorAll('.tab').forEach(t=>t.classList.toggle('open', !state.ctxOpen && t.dataset.tab===state.openTab));
+  hintEl.style.display=isOpen()?'none':'block';
+  updateStatus();
+}
+function onTabClick(tabId, pt){
+  if(CMP.mode==='classic'){ CMP.openClassicTab(tabId, pt); return; }
+  CMP.closeClassic(true);
+  if(!state.ctxOpen && state.openTab===tabId){ closeMenu(); return; }
+  state.ctxOpen=false; state.ctxC=null;
+  state.openTab=tabId; state.selection=[]; state.clickC=[]; state.morePage=0;
+  state.rootC = (pt && pt.x>0 && pt.y>0) ? {x:pt.x, y:pt.y} : null;   // Kays Punkt #2: C = Klickpunkt; Guard gegen koordinatenlose (synthetische) Klicks
+  CMP.start('callout', state.rootC);
+  render({animateDeepest:true});
+}
+function openContext(pt){
+  if(CMP.mode==='classic'){ CMP.openClassicCtx(pt); return; }
+  CMP.closeClassic(true);
+  state.openTab=null; state.ctxOpen=true; state.ctxC={x:pt.x,y:pt.y};
+  state.selection=[]; state.clickC=[]; state.applied=null; state.morePage=0;
+  CMP.start('callout', state.ctxC);
+  render({animateDeepest:true});
+}
+function onItemClick(li,item,clickPt){
+  if(clickPt && clickPt.x>0 && clickPt.y>0) CMP.leg(clickPt);          // nummerierter Wegpunkt je Interaktion
+  if(item._more){
+    state.morePage++;
+    if(clickPt && clickPt.x>0 && clickPt.y>0){                 // Blättern = Navigation: Ebene konvergiert neu am Klickpunkt
+      if(li===0){ if(state.ctxOpen) state.ctxC={x:clickPt.x, y:clickPt.y}; else state.rootC={x:clickPt.x, y:clickPt.y}; }
+      else state.clickC[li-1]={x:clickPt.x, y:clickPt.y};
+    }
+    clearHover(); render({animateDeepest:true}); return;
+  }  // Mehr -> nächste Seite (zyklisch)
+  state.morePage=0;                                                                          // echte Navigation startet auf Seite 1
+  const isLeaf=!item.children;
+  if(isLeaf){
+    state.selection=state.selection.slice(0,li); state.clickC=state.clickC.slice(0,li);
+    state.selection[li]=item.id; setApplied(); CMP.finish(state.applied); clearHover(); render();
+    if(!state.playing) setTimeout(closeMenu,700); return;
+  }
+  if(state.selection[li]===item.id){ state.selection=state.selection.slice(0,li); state.clickC=state.clickC.slice(0,li); clearHover(); render(); return; }
+  state.selection=state.selection.slice(0,li); state.clickC=state.clickC.slice(0,li);
+  state.selection[li]=item.id; if(clickPt)state.clickC[li]=clickPt;
+  clearHover(); render({animateDeepest:true});
+}
+function closeMenu(){ state.openTab=null; state.ctxOpen=false; state.ctxC=null; state.selection=[]; state.clickC=[]; state.hoverId=null; state.morePage=0; state.rootC=null; if(typeof CMP!=='undefined'){CMP.cancel(); if(!state.playing)CMP.clearTrail();} render(); }
+
+function setHover(li,item){ state.hoverId=li+':'+item.id;
+  armsSvg.querySelectorAll('g.callout').forEach(g=>g.classList.toggle('hover',(g.dataset.level+':'+g.dataset.id)===state.hoverId)); }
+function clearHover(){ state.hoverId=null; armsSvg.querySelectorAll('g.callout').forEach(g=>g.classList.remove('hover')); }
+
+function calloutLabels(){ const root=activeRoot(); if(!root)return []; const out=[root.label]; let items=root.children;
+  for(const id of state.selection){ const it=items.find(x=>x.id===id); if(!it)break; out.push(it.label); items=it.children||[]; } return out; }
+function setApplied(){ state.applied=calloutLabels().join(' \u2192 '); }
+function updateStatus(){
+  statusEl.innerHTML = state.applied
+    ? '<span class="ok">\u2713 '+state.applied+'</span>'
+    : '<span class="muted">Bereit</span>';
+}
+
+/* ============================== VERGLEICH KLASSISCH ↔ CALL-OUT ==============================
+   Konzept nach DEMO_Comparison V6 (K. Ullmann): erforderliche Cursor-Bewegungen als nummerierte
+   Wegstrecken sichtbar machen — hier live gemessen (Mausweg in px + Zeit) statt nur schematisch. */
+const trailSvg=$('#trailSvg'), hudEl=$('#hud');
+const CMP={
+  mode:'callout',                       // 'callout' | 'classic'
+  run:null,                             // aktiver Messlauf
+  last:{classic:null, callout:null},    // letzter abgeschlossener Lauf je Modus
+  copen:false, copenTab:null, cpanels:[], cpath:[], ctimer:null,
+
+  /* ---------- Messung ---------- */
+  start(mode, pt){
+    this.clearTrail();
+    this.run={mode, t0:performance.now(), dist:0, pts:[], legs:[], done:false};
+    if(pt && pt.x>0 && pt.y>0){ this.run.pts.push({x:pt.x,y:pt.y}); this.leg(pt); }
+    this.updateHud();
+  },
+  move(pt){
+    const r=this.run; if(!r||r.done) return;
+    const p=r.pts[r.pts.length-1];
+    if(p){ const d=Math.hypot(pt.x-p.x,pt.y-p.y); if(d<0.5) return; r.dist+=d; }
+    if(r.pts.length<8000) r.pts.push(pt);
+    this.updateHud(true);
+  },
+  leg(pt){ const r=this.run; if(!r||r.done||!pt) return;
+    const l=r.legs[r.legs.length-1];
+    if(l && Math.hypot(pt.x-l.x,pt.y-l.y)<6) return;                 // Doppelmarker vermeiden
+    r.legs.push({x:pt.x,y:pt.y}); },
+  finish(pathLabel){
+    const r=this.run; if(!r||r.done) return; r.done=true;
+    r.path=pathLabel; r.ms=performance.now()-r.t0;
+    this.last[r.mode]={path:pathLabel, dist:Math.round(r.dist), ms:r.ms, legs:r.legs.length};
+    if(state.playing) this.drawTrail(r); else this.clearTrail();   // Trail + Klickzaehler nur im Play-Ablauf
+    this.run=null; this.updateHud();
+  },
+  cancel(){ if(this.run && !this.run.done){ this.run=null; this.updateHud(); } },
+
+  /* ---------- Trail (nummerierte Wegstrecken) ---------- */
+  clearTrail(){ trailSvg.innerHTML=''; },
+  drawTrail(r){
+    this.clearTrail();
+    const col = r.mode==='classic' ? '#5b6675' : '#0E7A00';
+    if(r.pts.length>1){
+      const pl=document.createElementNS(NS,'polyline');
+      pl.setAttribute('points', r.pts.map(p=>n(p.x)+','+n(p.y)).join(' '));
+      pl.setAttribute('class','tr-line'); pl.setAttribute('stroke',col);
+      trailSvg.appendChild(pl);
+    }
+    r.legs.forEach((l,i)=>{
+      const c=document.createElementNS(NS,'circle');
+      c.setAttribute('cx',n(l.x)); c.setAttribute('cy',n(l.y)); c.setAttribute('r','9');
+      c.setAttribute('class','tr-dot'); c.setAttribute('fill',col); trailSvg.appendChild(c);
+      const t=document.createElementNS(NS,'text');
+      t.setAttribute('x',n(l.x)); t.setAttribute('y',n(l.y)); t.setAttribute('class','tr-num');
+      t.textContent=String(i+1); trailSvg.appendChild(t);
+    });
+  },
+
+  /* ---------- Klassische Menü-Engine ---------- */
+  openClassicTab(tabId, pt){
+    if(this.copen && this.copenTab===tabId){ this.closeClassic(true); return; }
+    this.closeClassic(false); closeMenu();
+    this.copen=true; this.copenTab=tabId; this.cpath=[TREE[tabId].label];
+    tabbar.querySelectorAll('.tab').forEach(t=>t.classList.toggle('open', t.dataset.tab===tabId));
+    hintEl.style.display='none';
+    this.start('classic', pt);
+    const el=tabbar.querySelector('.tab[data-tab="'+tabId+'"]'), r=el.getBoundingClientRect(), s=stageRect();
+    this.buildPanel(TREE[tabId].children, r.left-s.left, r.bottom-s.top+1, [TREE[tabId].label]);
+  },
+  openClassicCtx(pt){
+    this.closeClassic(false); closeMenu();
+    this.copen=true; this.copenTab=null; state.applied=null; updateStatus();
+    hintEl.style.display='none';
+    this.start('classic', pt);
+    this.buildPanel(CTX.children, pt.x, pt.y, [CTX.label]);
+  },
+  buildPanel(items, x, y, labels){
+    const s=stageRect();
+    const panel=document.createElement('div'); panel.className='cpanel'; panel.dataset.depth=this.cpanels.length;
+    items.forEach(it=>{
+      const d=document.createElement('div'); d.className='citem'; d.textContent=it.label;
+      if(it.children){ const c=document.createElement('span'); c.className='csub'; c.textContent='\u25B6'; d.appendChild(c); }
+      d.addEventListener('mouseenter',ev=>{
+        this.closePanelsDeeper(+panel.dataset.depth+1);
+        if(it.children){
+          clearTimeout(this.ctimer);
+          this.ctimer=setTimeout(()=>{
+            const dr=d.getBoundingClientRect(), pr=panel.getBoundingClientRect();
+            this.leg({x:dr.left-s.left+dr.width*0.7, y:dr.top-s.top+dr.height/2});   // Wegpunkt: Untermenue erreicht
+            this.buildPanel(it.children, pr.right-s.left-3, dr.top-s.top-4, labels.concat(it.label));
+          },140);
+        }
+      });
+      d.addEventListener('click',ev=>{
+        ev.stopPropagation();
+        if(it.children) return;                                       // Eltern oeffnen per Hover (wie im Original)
+        const pt=toStage(ev); if(pt.x>0&&pt.y>0) this.leg(pt);
+        d.classList.add('active');
+        const full=labels.concat(it.label).join(' \u2192 ');
+        setTimeout(()=>{ state.applied=full; updateStatus(); this.finish(full); this.closeClassic(false); },130);
+      });
+      panel.appendChild(d);
+    });
+    stage.appendChild(panel);
+    // Positionieren + Rand-Korrektur (Flip nach links / vertikales Klemmen)
+    panel.style.left=Math.round(x)+'px'; panel.style.top=Math.round(y)+'px';
+    const pr=panel.getBoundingClientRect();
+    let nx=x, ny=y;
+    if(pr.right>s.right-4){ nx = (this.cpanels.length? x-(pr.width*2)+6 : s.width-pr.width-4); }
+    if(pr.bottom>s.bottom-24){ ny = Math.max(2, s.height-24-pr.height); }
+    panel.style.left=Math.round(Math.max(2,nx))+'px'; panel.style.top=Math.round(ny)+'px';
+    this.cpanels.push(panel);
+  },
+  closePanelsDeeper(depth){ clearTimeout(this.ctimer);
+    while(this.cpanels.length>depth){ this.cpanels.pop().remove(); } },
+  closeClassic(cancelRun){
+    clearTimeout(this.ctimer);
+    this.cpanels.forEach(p=>p.remove()); this.cpanels=[];
+    if(this.copen){ this.copen=false; this.copenTab=null;
+      tabbar.querySelectorAll('.tab').forEach(t=>t.classList.remove('open'));
+      hintEl.style.display='block'; }
+    if(cancelRun) this.cancel();
+    if(!state.playing) this.clearTrail();
+  },
+
+  /* ---------- Demo-Ablauf (▶ Play, nach Referenz Excel-Klickdummy) ---------- */
+  scenario:'tab',
+  PLAY:{ tab:{tab:'einfuegen', ids:['diagramm','saeule','ss'], label:'Einf\u00FCgen \u2192 Diagramm \u2192 S\u00E4ule \u2192 Gestapelt'},
+         ctx:{ids:['format','prozent'], label:'Kontextmen\u00FC \u2192 Zellen formatieren \u2192 Prozent'} },
+  HIT:16,                                   // Play zielt auf den ARMANFANG: 16px von C (knapp ausserhalb der 12px-Toggle-Zone) — minimaler Mausweg
+  sleep(ms){ return new Promise(r=>setTimeout(r,ms)); },
+  placeCursor(x,y){
+    let g=trailSvg.querySelector('.cur');
+    if(!g){ g=document.createElementNS(NS,'g'); g.setAttribute('class','cur');
+      const pa=document.createElementNS(NS,'path');
+      pa.setAttribute('d','M0 0 L0 18 L4.8 13.6 L7.7 20 L10.1 19 L7.2 12.7 L12.6 12.5 Z');
+      g.appendChild(pa); trailSvg.appendChild(g); }
+    g.setAttribute('transform','translate('+n(x)+','+n(y)+')');
+  },
+  liveTrail(color){
+    const r=this.run; if(!r) return;
+    let pl=trailSvg.querySelector('.tr-live');
+    if(!pl){ pl=document.createElementNS(NS,'polyline'); pl.setAttribute('class','tr-live');
+      trailSvg.insertBefore(pl, trailSvg.firstChild); }
+    pl.setAttribute('stroke',color);
+    pl.setAttribute('points', r.pts.map(p=>n(p.x)+','+n(p.y)).join(' '));
+  },
+  animateTo(x,y,color){ const self=this;
+    return new Promise(res=>{
+      const r=self.run, st=(r&&r.pts.length)?r.pts[r.pts.length-1]:{x,y};
+      const d=Math.hypot(x-st.x,y-st.y), dur=Math.max(240,Math.min(760,d*1.05)), t0=performance.now();
+      (function frame(now){
+        const k=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-k,3);
+        const cx=st.x+(x-st.x)*e, cy=st.y+(y-st.y)*e;
+        self.placeCursor(cx,cy); self.move({x:cx,y:cy}); self.liveTrail(color);
+        if(k<1) requestAnimationFrame(frame); else res();
+      })(performance.now());
+    });
+  },
+  stepTargetCallout(li,id){
+    const g=armsSvg.querySelector('g.callout[data-level="'+li+'"][data-id="'+id+'"]');
+    if(!g) return null;
+    const C={x:+g.dataset.cx,y:+g.dataset.cy}, a={x:+g.dataset.ax,y:+g.dataset.ay};
+    const dx=a.x-C.x, dy=a.y-C.y, d=Math.hypot(dx,dy)||1, t=Math.min(this.HIT, d*0.8);
+    return {x:C.x+dx/d*t, y:C.y+dy/d*t};
+  },
+  classicItemEl(li,label){
+    const p=this.cpanels[li]; if(!p) return null;
+    return [...p.querySelectorAll('.citem')].find(e=>e.textContent.replace('\u25B6','')===label)||null;
+  },
+  async playDemo(){
+    if(state.playing) return;
+    state.playing=true; this.setPlayUI();
+    this.closeClassic(true); closeMenu(); this.clearTrail();
+    const mode=this.mode, sc=this.scenario, col = mode==='classic' ? '#5b6675' : '#0E7A00';
+    const s=stageRect();
+    // Startpunkt + Menue oeffnen (laeuft ueber die normalen Wege -> Messung startet automatisch)
+    let root, ids;
+    if(sc==='ctx'){
+      const gw=document.querySelector('.gridwrap').getBoundingClientRect();
+      const pt={x:gw.left-s.left+gw.width*0.42, y:gw.top-s.top+gw.height*0.22};
+      this.placeCursor(pt.x,pt.y);
+      if(mode==='classic') this.openClassicCtx(pt); else openContext(pt);
+      root=CTX; ids=this.PLAY.ctx.ids;
+    } else {
+      const tr=tabbar.querySelector('.tab[data-tab="'+this.PLAY.tab.tab+'"]').getBoundingClientRect();
+      const pt={x:tr.left-s.left+tr.width/2, y:tr.bottom-s.top-6};
+      this.placeCursor(pt.x,pt.y);
+      if(mode==='classic') this.openClassicTab(this.PLAY.tab.tab, pt); else onTabClick(this.PLAY.tab.tab, pt);
+      root=TREE[this.PLAY.tab.tab]; ids=this.PLAY.tab.ids;
+    }
+    await this.sleep(460);
+    // Pfad aufloesen
+    let items=root.children; const steps=[];
+    for(const id of ids){ const it=items.find(x=>x.id===id); if(!it)break; steps.push(it); items=it.children||[]; }
+    for(let li=0; li<steps.length && state.playing; li++){
+      const it=steps[li];
+      if(mode==='callout'){
+        const tgt=this.stepTargetCallout(li,it.id); if(!tgt) break;
+        await this.animateTo(tgt.x,tgt.y,col); await this.sleep(120);
+        onItemClick(li,it,tgt); await this.sleep(380);
+      } else {
+        const el=this.classicItemEl(li,it.label); if(!el) break;
+        const r2=el.getBoundingClientRect();
+        const tgt={x:r2.left-s.left+r2.width*0.55, y:r2.top-s.top+r2.height/2};
+        await this.animateTo(tgt.x,tgt.y,col); await this.sleep(120);
+        if(it.children){ el.dispatchEvent(new MouseEvent('mouseenter')); await this.sleep(280); }
+        else { el.dispatchEvent(new MouseEvent('click',{bubbles:true, clientX:s.left+tgt.x, clientY:s.top+tgt.y})); await this.sleep(300); }
+      }
+    }
+    state.playing=false; this.setPlayUI();
+  },
+  setPlayUI(){ this.updateHud(); },
+
+  /* ---------- HUD ---------- */
+  setMode(m){
+    if(this.mode===m) return;
+    this.closeClassic(true); closeMenu(); this.cancel(); this.clearTrail();
+    this.mode=m; this.updateHud();
+  },
+  fmt(v){ return Math.round(v).toLocaleString('de-DE'); },
+  updateHud(liveOnly){
+    if(liveOnly && this.run){ const el=hudEl.querySelector('.h-live .val');
+      if(el){ el.textContent=this.fmt(this.run.dist)+' px'; return; } }
+    const L=this.last, r=this.run;
+    let h='<div class="h-title">VERGLEICH \u00B7 MAUSWEG</div>';
+    const dis=state.playing?' disabled':'';
+    h+='<div class="h-seg"><button data-m="classic"'+(this.mode==='classic'?' class="on"':'')+dis+'>Klassisch</button>'
+     + '<button data-m="callout"'+(this.mode==='callout'?' class="on"':'')+dis+'>Peacock menu</button></div>';
+    h+='<div class="h-task">Aufgabe: <b>'+this.PLAY[this.scenario].label+'</b> \u2014 selbst navigieren oder \u25B6 Play je Modus.</div>';
+    h+='<div class="h-play"><div class="h-seg"><button data-s="tab"'+(this.scenario==='tab'?' class="on"':'')+'>Reiter-Men\u00FC</button>'
+     + '<button data-s="ctx"'+(this.scenario==='ctx'?' class="on"':'')+'>Kontextmen\u00FC</button></div>'
+     + '<button class="h-btn" data-play'+dis+'>'+(state.playing?'\u25B6 l\u00E4uft\u2026':'\u25B6 Play')+'</button></div>';
+    if(r && !r.done) h+='<div class="h-live">Mausweg aktuell: <span class="val">'+this.fmt(r.dist)+' px</span></div>';
+    if(L.classic||L.callout){
+      h+='<div class="h-rows">';
+      if(L.classic) h+='<div class="h-row classic"><span><span class="dot"></span>Klassisch</span><span><b>'+this.fmt(L.classic.dist)+' px</b> \u00B7 '+(L.classic.ms/1000).toLocaleString('de-DE',{maximumFractionDigits:1})+'\u2009s</span></div>';
+      if(L.callout) h+='<div class="h-row callout"><span><span class="dot"></span>Peacock menu</span><span><b>'+this.fmt(L.callout.dist)+' px</b> \u00B7 '+(L.callout.ms/1000).toLocaleString('de-DE',{maximumFractionDigits:1})+'\u2009s</span></div>';
+      h+='</div>';
+      if(L.classic&&L.callout&&L.classic.path===L.callout.path&&L.classic.dist>0){
+        const pct=Math.round((1-L.callout.dist/L.classic.dist)*100);
+        h+='<div class="h-save">Ersparnis Mausweg: <span class="'+(pct>=0?'pos':'')+'">'+(pct>=0?'\u2212':'+')+Math.abs(pct)+'\u2009%</span></div>';
+      } else if(L.classic&&L.callout){
+        h+='<div class="h-save" style="font-weight:400;color:#5b6675">F\u00FCr die Ersparnis dieselbe Auswahl in beiden Modi treffen.</div>';
+      }
+    }
+    h+='<div class="h-foot"><a data-reset>Zur\u00FCcksetzen</a></div>';
+    hudEl.innerHTML=h;
+  }
+};
+hudEl.addEventListener('click',ev=>{
+  ev.stopPropagation();
+  if(state.playing) return;
+  const b=ev.target.closest('button[data-m]'); if(b){ CMP.setMode(b.dataset.m); return; }
+  const sBtn=ev.target.closest('button[data-s]'); if(sBtn){
+    CMP.scenario=sBtn.dataset.s; CMP.closeClassic(true); closeMenu(); CMP.clearTrail(); CMP.updateHud(); return; }
+  if(ev.target.closest('[data-play]')){ CMP.playDemo(); return; }
+  if(ev.target.closest('[data-reset]')){
+    CMP.last={classic:null,callout:null}; CMP.cancel(); CMP.clearTrail(); CMP.closeClassic(false); closeMenu(); CMP.updateHud(); }
+});
+hudEl.addEventListener('mousedown',ev=>ev.stopPropagation());
+document.addEventListener('mousemove',ev=>{ if(CMP.run && !state.playing) CMP.move(toStage(ev)); });
+CMP.updateHud();
+
+/* ---- Steuerung ---- */
+sheet.addEventListener('contextmenu',function(ev){ ev.preventDefault(); ev.stopPropagation(); if(state.playing)return; openContext(toStage(ev)); });
+let suppressNextClick=false, suppressClickUntil=0;
+stage.addEventListener('mousedown',function(ev){
+  if(state.playing) return;
+  // Im Menueband (C = Klickpunkt) sind Click-Events unzuverlaessig (Hover-Raise bricht die Synthese),
+  // daher laeuft die gesamte Interaktion dort ueber mousedown:
+  //  - Klick trifft einen Arm  -> Item gewinnt (naechste Ebene am Klickpunkt) ...
+  //  - ... AUSSER der Punkt liegt ueber dem GEOEFFNETEN Tab -> Toggle/Tab-Verhalten
+  //  - Totzone (kein Arm getroffen) -> Tab unter dem Punkt
+  if(!isOpen()) return;
+  const tbR=tabbar.getBoundingClientRect();
+  if(ev.clientY>tbR.bottom) return;
+  const t=ev.target;
+  if(!(t===armsSvg || (t.closest && t.closest('#armsSvg')))) return;  // direkter Tab-Klick: normaler Weg
+  const pt=toStage(ev);
+  const gEl=(t.closest && t.closest('g.callout'))||null;
+  // Toggle-Zone: nur in unmittelbarer Naehe des Konvergenzpunkts C gewinnt der Tab (dort ist das Buendel ohnehin mehrdeutig)
+  const g0=armsSvg.querySelector('g.callout:not([visibility])');
+  const nearC=!!g0 && Math.hypot(pt.x-(+g0.dataset.cx), pt.y-(+g0.dataset.cy))<=12;
+  ev.preventDefault(); ev.stopPropagation();
+  suppressNextClick=true; suppressClickUntil=performance.now()+150; // nur den Click DERSELBEN Geste schlucken
+  if(gEl && !gEl.hasAttribute('visibility') && !nearC){
+    const item=itemReg[gEl.dataset.level+':'+gEl.dataset.id];
+    if(item){ onItemClick(+gEl.dataset.level, item, pt); return; }
+  }
+  const tEl=[...tabbar.querySelectorAll('.tab')].find(el=>{const r=el.getBoundingClientRect(); return ev.clientX>=r.left&&ev.clientX<=r.right;});
+  if(tEl) onTabClick(tEl.dataset.tab, pt);
+},true);
+stage.addEventListener('click',function(ev){
+  if(suppressNextClick && performance.now()<suppressClickUntil){ suppressNextClick=false; ev.stopPropagation(); ev.preventDefault(); return; }
+  suppressNextClick=false;
+},true);
+stage.addEventListener('click',function(){ if(state.playing)return; if(isOpen()) closeMenu(); if(CMP.copen) CMP.closeClassic(true); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!state.playing){ closeMenu(); CMP.closeClassic(true); } });
+
+updateStatus();
+})();
+
+</script>
+</body>
+</html>
