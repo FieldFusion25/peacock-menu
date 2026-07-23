@@ -468,78 +468,31 @@ function bubbleW(label){ return labelWidth(label)+PAD_X*2; }
 function showsChevron(it){ return !!it.children; }
 function itemLabel(it){ return it.label; }
 
-const CR=6;             // Eckradius (nur wo kein Arm-Ansatz liegt) — Stil unserer Demo, unveraendert
-const ARM_T=12;         // Dreiecksbasis am Bubble-Rand (senkrecht zur Armachse) — Referenz: Kays Layout-Editor
-const ARM_VMAX=4;       // Sicherheitskappung: vertikaler Schnitt max. ARM_VMAX*ARM_T (Seitenkanten-Ansatz)
-let LAST_ANCHOR=null;   // Ansatzpunkt des zuletzt gebauten Arms (fuer dataset/Play-Zielpunkte)
-/* Fuehrungsarm = ECHTES DREIECK (Feedback Dr. Ullmann, 23.07.): Basis liegt auf dem Bubble-Rand,
-   die Spitze zeigt DIREKT auf den Klickpunkt C — kein Knie, keine konstante Banddicke.
-   Bubble-Koerper und Dreieck bleiben EIN zusammenhaengender SVG-Pfad. */
+const CR=6;             // Eckradius (nur wo kein Arm-Ansatz liegt)
+const ARM_T=10;         // KONSTANTE Armdicke (senkrecht zur Armachse) – ueberall gleich, gut klickbar
+const KNEE_D=24;        // Knie-Abstand zu C: bis hier volle Dicke, danach Konvergenz
+const ARM_VMAX=4;       // Sicherheitskappung: vertikaler Schnitt max. ARM_VMAX*ARM_T (nahezu senkrechte Arme)
 function calloutPath(cx,cy,w,h,C){
   const left=cx-w/2, right=cx+w/2, top=cy-h/2, bottom=cy+h/2;
   const r=Math.min(CR, h/2, w/2);
   const toRight=(C.x>=cx);            // C rechts -> Arm an rechter (innerer) Kante
   const edgeX=toRight?right:left;
-  const dx0=Math.max(0.5, Math.abs(C.x-edgeX)), dy0=C.y-cy;
-  /* --- steiler Arm (>~50°): Dreiecksbasis an Ober-/Unterkante, HORIZONTALER Schnitt ---
-     hh = ARM_T*len/|dy| haelt die scheinbare Basisbreite senkrecht zur Armachse konstant ARM_T,
-     genau wie hv beim Seitenkanten-Ansatz. Uebergang bei |dy|>1.2*dx. */
-  if(Math.abs(dy0)>dx0*1.2){
-    const attachTop=C.y<cy;
-    const edgeY=attachTop?top:bottom;
-    const dyE=edgeY-C.y, adyE=Math.max(0.5,Math.abs(dyE));
-    let bx=Math.max(left+r+1, Math.min(right-r-1, C.x));
-    let len=Math.hypot(bx-C.x,dyE);
-    let hh=Math.min(ARM_T*len/adyE, w-2*r-4);
-    bx=Math.max(left+r+1+hh/2, Math.min(right-r-1-hh/2, bx));
-    len=Math.hypot(bx-C.x,dyE);
-    hh=Math.min(ARM_T*len/adyE, w-2*r-4);
-    const x1=bx-hh/2, x2=bx+hh/2;
-    LAST_ANCHOR={x:bx,y:edgeY};
-    const P=[];
-    if(attachTop){
-      P.push('M '+n(left+r)+' '+n(top));
-      P.push('L '+n(x1)+' '+n(top));
-      P.push('L '+n(C.x)+' '+n(C.y));        // SPITZE: exakter Klickpunkt (direktes Dreieck)
-      P.push('L '+n(x2)+' '+n(top));
-      P.push('L '+n(right-r)+' '+n(top));
-      P.push('A '+n(r)+' '+n(r)+' 0 0 1 '+n(right)+' '+n(top+r));
-      P.push('L '+n(right)+' '+n(bottom-r));
-      P.push('A '+n(r)+' '+n(r)+' 0 0 1 '+n(right-r)+' '+n(bottom));
-      P.push('L '+n(left+r)+' '+n(bottom));
-      P.push('A '+n(r)+' '+n(r)+' 0 0 1 '+n(left)+' '+n(bottom-r));
-      P.push('L '+n(left)+' '+n(top+r));
-      P.push('A '+n(r)+' '+n(r)+' 0 0 1 '+n(left+r)+' '+n(top));
-      P.push('Z');
-    } else {
-      P.push('M '+n(left+r)+' '+n(top));
-      P.push('L '+n(right-r)+' '+n(top));
-      P.push('A '+n(r)+' '+n(r)+' 0 0 1 '+n(right)+' '+n(top+r));
-      P.push('L '+n(right)+' '+n(bottom-r));
-      P.push('A '+n(r)+' '+n(r)+' 0 0 1 '+n(right-r)+' '+n(bottom));
-      P.push('L '+n(x2)+' '+n(bottom));
-      P.push('L '+n(C.x)+' '+n(C.y));        // SPITZE: exakter Klickpunkt (direktes Dreieck)
-      P.push('L '+n(x1)+' '+n(bottom));
-      P.push('L '+n(left+r)+' '+n(bottom));
-      P.push('A '+n(r)+' '+n(r)+' 0 0 1 '+n(left)+' '+n(bottom-r));
-      P.push('L '+n(left)+' '+n(top+r));
-      P.push('A '+n(r)+' '+n(r)+' 0 0 1 '+n(left+r)+' '+n(top));
-      P.push('Z');
-    }
-    return P.join(' ');
-  }
-  LAST_ANCHOR={x:edgeX,y:cy};
-  // Dreiecksbasis konstanter scheinbarer Breite: vertikaler Schnitt hv = ARM_T * Armlaenge / horizontaler Anteil
+  // Band konstanter senkrechter Dicke: vertikaler Schnitt hv = ARM_T * Armlaenge / horizontaler Anteil
   const dx=Math.max(0.5, Math.abs(C.x-edgeX)), dyv=C.y-cy;
   const len=Math.hypot(dx,dyv);
   let hv=ARM_T*len/dx; hv=Math.min(hv, ARM_T*ARM_VMAX);
-  let eT=cy-hv/2, eB=cy+hv/2;                             // Basispunkte mittig an der Innenkante
-  // Steile Arme: Basis wandert um die Ecke auf Ober-/Unterkante; xLine = direkte Gerade C -> Kantenpunkt
+  // Knie: bis hierhin volle Dicke, danach symmetrische Konvergenz DIREKT in den Punkt C (kein Versatz, kein Knick)
+  const kd=Math.min(KNEE_D, 0.4*len);
+  const ux=(edgeX-C.x)/len;
+  const kx=C.x+ux*kd, kcy=C.y+((cy-C.y)*(kd/len));   // Knie-Zentrum exakt auf der Armachse
+  const kT=kcy-hv/2, kB=kcy+hv/2;
+  let eT=cy-hv/2, eB=cy+hv/2;                             // Ansatz mittig an der Innenkante
+  // Steile Arme: Ansatz wandert um die Ecke auf Ober-/Unterkante (Dicke bleibt konstant)
   const wrapT=eT<top, wrapB=eB>bottom;
-  const xLine=(yLine,ea)=>{ const s=(yLine-C.y)/(ea-C.y); return C.x+s*(edgeX-C.x); };
+  const xLine=(yLine,ka,ea)=>{ const s=(yLine-ka)/(ea-ka); return kx+s*(edgeX-kx); };
   let xT=null,xB=null;
-  if(wrapT){ xT=Math.max(left+2, Math.min(right-2, xLine(top,eT))); }
-  if(wrapB){ xB=Math.max(left+2, Math.min(right-2, xLine(bottom,eB))); }
+  if(wrapT){ xT=Math.max(left+2, Math.min(right-2, xLine(top,kT,eT))); }
+  if(wrapB){ xB=Math.max(left+2, Math.min(right-2, xLine(bottom,kB,eB))); }
   const rT=wrapT?0:Math.max(0,Math.min(r,eT-top));
   const rB=wrapB?0:Math.max(0,Math.min(r,bottom-eB));
   const P=[];
@@ -549,7 +502,9 @@ function calloutPath(cx,cy,w,h,C){
     else { P.push('L '+n(right-rT)+' '+n(top));
       if(rT>0) P.push('A '+n(rT)+' '+n(rT)+' 0 0 1 '+n(right)+' '+n(top+rT));
       P.push('L '+n(right)+' '+n(eT)); }
-    P.push('L '+n(C.x)+' '+n(C.y));     // SPITZE: exakter Klickpunkt (direktes Dreieck)
+    P.push('L '+n(kx)+' '+n(kT));       // Knie oben
+    P.push('L '+n(C.x)+' '+n(C.y));     // SPITZE: exakter Klickpunkt
+    P.push('L '+n(kx)+' '+n(kB));       // Knie unten
     if(wrapB){ P.push('L '+n(xB)+' '+n(bottom)); }
     else { P.push('L '+n(right)+' '+n(eB));
       P.push('L '+n(right)+' '+n(bottom-rB));
@@ -569,7 +524,9 @@ function calloutPath(cx,cy,w,h,C){
     else { P.push('L '+n(left+rB)+' '+n(bottom));
       if(rB>0) P.push('A '+n(rB)+' '+n(rB)+' 0 0 1 '+n(left)+' '+n(bottom-rB));
       P.push('L '+n(left)+' '+n(eB)); }
-    P.push('L '+n(C.x)+' '+n(C.y));     // SPITZE: exakter Klickpunkt (direktes Dreieck)
+    P.push('L '+n(kx)+' '+n(kB));       // Knie unten
+    P.push('L '+n(C.x)+' '+n(C.y));     // SPITZE: exakter Klickpunkt
+    P.push('L '+n(kx)+' '+n(kT));       // Knie oben
     if(!wrapT){ P.push('L '+n(left)+' '+n(eT));
       P.push('L '+n(left)+' '+n(top+rT));
       if(rT>0) P.push('A '+n(rT)+' '+n(rT)+' 0 0 1 '+n(left+rT)+' '+n(top)); }
@@ -578,45 +535,32 @@ function calloutPath(cx,cy,w,h,C){
   return P.join(' ');
 }
 
-/* Gleichwinkel-Fächer (Referenz: Kays Layout-Editor) — Armachsen GLEICHMAESSIG zwischen
-   TH_MIN und TH_MAX verteilt, horizontaler Abstand daraus berechnet. Garantiert konstruktiv,
-   dass sich benachbarte Arme NICHT ueberlagern (Feedback Dr. Ullmann: "Arme gehen ineinander"). */
-const MORE_CAP=6;         // feste Slot-Zahl inkl. "(Weitere Einträge)"-Platzhalter (Referenz: Element 721)
-const VAL_SQ=16;          // Minimal-Tal, falls eine Seite sehr eng ist
-const INSET=16;           // Ansatzpunkt-Abstand zur Boxinnenkante bei steilen Armen
-const TH_MIN=Math.PI/9;   // ~20°: flachster Arm (oberste Reihe, weit aussen)
-const TH_MAX=Math.PI/2;   // 90°: steilster Arm senkrecht unter/ueber C
+/* Keil-Fächer (Referenzform): Treppe pro Seite, Innenkanten-Abstand oben groß, unten klein -> nahtloser Fächer */
+const MORE_CAP=6;      // feste Slot-Zahl inkl. "(Weitere Einträge)"-Platzhalter (Referenz: Element 721)
+const VALLEY_MIN=38;   // Abstand C -> Innenkante der UNTERSTEN Zeile (am nächsten an C)
+const SPREAD=74;       // zusätzlicher Abstand der OBERSTEN Zeile (weit außen)
+const FAN_P=1.5;       // Krümmung des Bogens (1=gerade Treppe, >1=nach außen gekrümmt)
 function layoutLevel(C, prevRef, items, bounds){
   const N=items.length;
   const H=bubbleH();
   const widths=items.map(it=> bubbleW(itemLabel(it))+(showsChevron(it)?14:0));
   const W=Math.max(...widths);
-  const rowH=H+10, drop=(prevRef?16:6);
+  const rowH=H, drop=(prevRef?12:0);
   const m=12;
-  const roomL=C.x-m, roomR=bounds.w-C.x-m, needSide=W+48;
+  const VAL_SQ=16;                                        // gestauchtes Minimal-Tal fuer enge Seiten
+  const roomL=C.x-m, roomR=bounds.w-C.x-m, needSide=W+VALLEY_MIN;
   const out=[];
-  let vdir=+1;
-  const placeSide=(arr,side,kMax)=>{
+  let vdir=+1;                                             // vertikale Fächerrichtung: +1 nach unten, -1 nach oben
+  const placeSide=(arr,side,kMax)=>{                       // side: -1 links, +1 rechts; kMax: groesste Seitenzahl der Ebene
     if(!arr.length) return;
-    const k=arr.length, room=(side<0?roomL:roomR);
-    const offCap=Math.max(VAL_SQ, room-W);                           // nie ueber den Bildschirmrand
-    const cys=[], dys=[];
-    for(let i=0;i<k;i++){ const cy=C.y+vdir*(drop+H/2+i*rowH); cys.push(cy); dys.push(Math.max(1,Math.abs(cy-C.y))); }
-    // maximal erreichbarer Winkel der C-naechsten Reihe (Innenkante am Minimal-Tal)
-    const thMaxEff=Math.min(TH_MAX, Math.atan2(Math.max(1,dys[k-1]-H/2), VAL_SQ+INSET));
-    arr.forEach((it,i)=>{
-      // Armachsen-Winkel gleichverteilt ueber kMax -> Seiten spiegeln sich
-      const t = kMax>1 ? i/(kMax-1) : 0;
-      const th=(kMax===1)?Math.PI/4:TH_MIN+(thMaxEff-TH_MIN)*t;
-      const tanth=Math.tan(Math.min(th, 1.5533));                    // 89°-Kappung gegen Infinity
-      let off;
-      if(tanth>1.2){                                                 // steiler Arm: Ansatz Ober-/Unterkante,
-        off=Math.max(1,dys[i]-H/2)/tanth-INSET;                      // Achse trifft die Kante im Nominalwinkel
-      } else {                                                       // flacher Arm: Ansatz Seitenkante
-        off=dys[i]/tanth;
-      }
-      off=Math.max(VAL_SQ, Math.min(offCap, off));
-      out.push({item:it, w:W, h:H, cx:C.x+side*(off+W/2), cy:cys[i]});
+    const room=(side<0?roomL:roomR);
+    const valley=Math.max(VAL_SQ, Math.min(VALLEY_MIN, room-W));     // Tal ggf. stauchen (enge Seite)
+    const spread=Math.max(0, Math.min(SPREAD, (room-W)-valley));     // Spread so weit wie Platz reicht
+    arr.forEach((it,row)=>{
+      const t = kMax>1 ? row/(kMax-1) : 0;                 // 0 (oben) .. 1 (unten) – ueber kMax: Seiten spiegeln sich
+      const off = valley + spread*Math.pow(1-t, FAN_P);    // Innenkanten-Abstand zu C (oben groß, unten klein)
+      const innerX = C.x + side*off;
+      out.push({item:it, w:W, h:H, cx:innerX + side*W/2, cy:C.y+vdir*(drop+H/2+row*rowH)});  // EINHEITLICHE Breite W (Ebenen-Maximum): Innenkante (Arm) bleibt, Außenkante gleichgezogen
     });
   };
   const chooseVdir=(kMax)=>{                             // Anspruch 7: freien Raum auch vertikal auswerten
@@ -765,7 +709,7 @@ function drawCallout(bounds,opts){
     path.setAttribute('d',calloutPath(p.cx,p.cy,p.w,p.h,lvl.C));
     path.setAttribute('class','co-body'); g.appendChild(path);
     g.dataset.cx=n(lvl.C.x); g.dataset.cy=n(lvl.C.y);
-    const A=LAST_ANCHOR||{x:(lvl.C.x>=p.cx)?p.cx+p.w/2:p.cx-p.w/2, y:p.cy}; g.dataset.ax=n(A.x); g.dataset.ay=n(A.y); g.dataset.px=n(p.cx); g.dataset.py=n(p.cy); g.dataset.w=n(p.w); g.dataset.h=n(p.h);
+    const armX=(lvl.C.x>=p.cx)?p.cx+p.w/2:p.cx-p.w/2; g.dataset.ax=n(armX); g.dataset.ay=n(p.cy);
     const chev=showsChevron(p.item);
     const t=document.createElementNS(NS,'text');
     t.setAttribute('x',chev?p.cx-7:p.cx); t.setAttribute('y',p.cy);
