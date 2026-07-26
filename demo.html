@@ -133,17 +133,11 @@ table.grid tr.subtotal td,table.grid tr.subtotal th{font-weight:700;background:#
 
 #armsSvg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:30}
 
-/* Fächerrahmen: umschliessendes Panel je Ebene (Aequivalent zum Panel-Rahmen des klassischen Menüs, in Fächerform mit Spitze in C).
-   Zwei Fat-Stroke-Pfade derselben Huelle: aussen Randfarbe, innen Panelfarbe -> gepolsterter Rahmen mit runden Ecken. */
-g.frame{pointer-events:none;filter:drop-shadow(0 3px 10px rgba(20,40,20,.16))}
-g.frame .f-border{fill:#c3c9c4;stroke:#c3c9c4;stroke-linejoin:round}
-g.frame .f-fill{fill:#fafbfa;stroke:#fafbfa;stroke-linejoin:round}
-
 /* ---- Call-out (SVG) – unveränderte Fächer-Engine, LibreOffice-grün ---- */
 g.callout{cursor:pointer;pointer-events:auto;filter:drop-shadow(0 2px 4px rgba(0,0,0,.16))}
 g.callout .co-body{fill:#fff;stroke:#c7cdc9;stroke-width:1;transition:fill .12s,stroke .12s,stroke-width .12s}
-g.callout .co-label{fill:var(--ink);font:400 10.5px var(--font);pointer-events:none}
-g.callout .co-chevron{fill:#445;font-size:10px;font-weight:700;pointer-events:none}
+g.callout .co-label{fill:var(--ink);font:400 12px var(--font);pointer-events:none}
+g.callout .co-chevron{fill:#445;font-size:9px;font-weight:700;pointer-events:none}
 g.callout:not(.selected):hover .co-body,g.callout.hover:not(.selected) .co-body{fill:var(--hov);stroke:var(--hov-line);stroke-width:1}
 g.callout:not(.selected):hover .co-label,g.callout.hover:not(.selected) .co-label{fill:var(--ink)}
 g.callout:not(.selected):hover .co-chevron,g.callout.hover:not(.selected) .co-chevron{fill:#445}
@@ -440,7 +434,9 @@ TAB_ORDER.forEach(id=>{
 })();
 
 /* ============================== ZUSTAND ============================== */
-const state={ openTab:null, selection:[], clickC:[], hoverId:null, applied:null, ctxOpen:false, ctxC:null, playing:false, morePage:0, rootC:null };
+/* pages[] = Blätterseite JE EBENE (nicht global): eine Ebene behält ihre Seite,
+   wenn man in einen ihrer Einträge hineinnavigiert. */
+const state={ openTab:null, selection:[], clickC:[], hoverId:null, applied:null, ctxOpen:false, ctxC:null, playing:false, pages:[], rootC:null };
 
 /* ============================== GEOMETRIE (unveränderte Call-out-Engine) ============================== */
 function stageRect(){ return stage.getBoundingClientRect(); }
@@ -462,16 +458,24 @@ measureG.appendChild(measureText);
 const wcache={};
 function ensureMeasure(){ if(!measureG.isConnected) armsSvg.appendChild(measureG); }
 function labelWidth(s){ if(wcache[s]!=null)return wcache[s]; ensureMeasure(); measureText.textContent=s; const w=measureText.getBBox().width; wcache[s]=w; return w; }
-let BUBBLE_H=null; const PAD_X=5, PAD_Y=2;
+let BUBBLE_H=null; const PAD_X=11, PAD_Y=6, CHEV_W=16;
 function bubbleH(){ if(BUBBLE_H==null){ ensureMeasure(); measureText.textContent='Ag'; BUBBLE_H=measureText.getBBox().height+PAD_Y*2; } return BUBBLE_H; }
 function bubbleW(label){ return labelWidth(label)+PAD_X*2; }
 function showsChevron(it){ return !!it.children; }
 function itemLabel(it){ return it.label; }
+/* Einheitliche Bubble-Breite einer Ebene: das Maximum ueber alle angezeigten
+   Eintraege (inkl. Platz fuer den Untermenue-Chevron). Jede Bubble derselben
+   Ebene bekommt exakt diese Breite — die Groesse folgt dem laengsten Label. */
+function levelWidth(items){ return Math.max.apply(null, items.map(it=> bubbleW(itemLabel(it))+(showsChevron(it)?CHEV_W:0))); }
 
-const CR=6;             // Eckradius (nur wo kein Arm-Ansatz liegt)
-const ARM_T=10;         // KONSTANTE Armdicke (senkrecht zur Armachse) – ueberall gleich, gut klickbar
-const KNEE_D=24;        // Knie-Abstand zu C: bis hier volle Dicke, danach Konvergenz
-const ARM_VMAX=4;       // Sicherheitskappung: vertikaler Schnitt max. ARM_VMAX*ARM_T (nahezu senkrechte Arme)
+const CR=0;             // Eckradius der Bubbles (0 = eckig; wirkt nur, wo kein Arm-Ansatz liegt)
+const ARM_T=11;         // KONSTANTE Armdicke (senkrecht zur Armachse) – ueberall gleich, gut klickbar
+const KNEE_D=26;        // Knie-Abstand zu C: bis hier volle Dicke, danach Konvergenz
+/* Sicherheitskappung des vertikalen Schnitts. Der steilste Arm liegt bei PHI_MIN
+   Grad zur Senkrechten und braucht ARM_T/sin(PHI_MIN) ~ 4.5*ARM_T; die Grenze
+   liegt knapp darueber, damit auch der steilste Arm seine volle Dicke behaelt
+   statt zur Haarlinie zu schrumpfen. */
+const ARM_VMAX=4.7;
 function calloutPath(cx,cy,w,h,C){
   const left=cx-w/2, right=cx+w/2, top=cy-h/2, bottom=cy+h/2;
   const r=Math.min(CR, h/2, w/2);
@@ -510,16 +514,16 @@ function calloutPath(cx,cy,w,h,C){
       P.push('L '+n(right)+' '+n(bottom-rB));
       if(rB>0) P.push('A '+n(rB)+' '+n(rB)+' 0 0 1 '+n(right-rB)+' '+n(bottom)); }
     P.push('L '+n(left+r)+' '+n(bottom));
-    P.push('A '+n(r)+' '+n(r)+' 0 0 1 '+n(left)+' '+n(bottom-r));
+    if(r>0) P.push('A '+n(r)+' '+n(r)+' 0 0 1 '+n(left)+' '+n(bottom-r));
     P.push('L '+n(left)+' '+n(top+r));
-    P.push('A '+n(r)+' '+n(r)+' 0 0 1 '+n(left+r)+' '+n(top));
+    if(r>0) P.push('A '+n(r)+' '+n(r)+' 0 0 1 '+n(left+r)+' '+n(top));
     P.push('Z');
   } else {
     P.push('M '+n(wrapT?xT:left+rT)+' '+n(top));
     P.push('L '+n(right-r)+' '+n(top));
-    P.push('A '+n(r)+' '+n(r)+' 0 0 1 '+n(right)+' '+n(top+r));
+    if(r>0) P.push('A '+n(r)+' '+n(r)+' 0 0 1 '+n(right)+' '+n(top+r));
     P.push('L '+n(right)+' '+n(bottom-r));
-    P.push('A '+n(r)+' '+n(r)+' 0 0 1 '+n(right-r)+' '+n(bottom));
+    if(r>0) P.push('A '+n(r)+' '+n(r)+' 0 0 1 '+n(right-r)+' '+n(bottom));
     if(wrapB){ P.push('L '+n(xB)+' '+n(bottom)); }
     else { P.push('L '+n(left+rB)+' '+n(bottom));
       if(rB>0) P.push('A '+n(rB)+' '+n(rB)+' 0 0 1 '+n(left)+' '+n(bottom-rB));
@@ -535,72 +539,129 @@ function calloutPath(cx,cy,w,h,C){
   return P.join(' ');
 }
 
-/* Keil-Fächer (Referenzform): Treppe pro Seite, Innenkanten-Abstand oben groß, unten klein -> nahtloser Fächer */
-const MORE_CAP=6;      // feste Slot-Zahl inkl. "(Weitere Einträge)"-Platzhalter (Referenz: Element 721)
-const VALLEY_MIN=38;   // Abstand C -> Innenkante der UNTERSTEN Zeile (am nächsten an C)
-const SPREAD=74;       // zusätzlicher Abstand der OBERSTEN Zeile (weit außen)
-const FAN_P=1.5;       // Krümmung des Bogens (1=gerade Treppe, >1=nach außen gekrümmt)
-function layoutLevel(C, prevRef, items, bounds){
-  const N=items.length;
-  const H=bubbleH();
-  const widths=items.map(it=> bubbleW(itemLabel(it))+(showsChevron(it)?14:0));
-  const W=Math.max(...widths);
-  const rowH=H, drop=(prevRef?12:0);
-  const m=12;
-  const VAL_SQ=16;                                        // gestauchtes Minimal-Tal fuer enge Seiten
-  const roomL=C.x-m, roomR=bounds.w-C.x-m, needSide=W+VALLEY_MIN;
-  const out=[];
-  let vdir=+1;                                             // vertikale Fächerrichtung: +1 nach unten, -1 nach oben
-  const placeSide=(arr,side,kMax)=>{                       // side: -1 links, +1 rechts; kMax: groesste Seitenzahl der Ebene
+/* ===================== FÄCHER-LAYOUT: ERST DER WINKEL, DANN DIE POSITION =====================
+   Die Ebene wird nicht ueber Pixel-Abstaende aufgebaut, sondern ueber Armwinkel:
+   Zeile 0 (dichteste an C) bekommt den flachsten Arm, jede weitere Zeile einen
+   steileren, in gleichen Winkelschritten. Daraus folgt der horizontale Versatz.
+
+   Das garantiert Ueberschneidungsfreiheit strukturell statt zufaellig:
+     * der Winkel faellt streng monoton mit der Zeile,
+     * der vertikale Abstand |dy| waechst streng monoton mit der Zeile,
+     * der Versatz "off" ist nie steigend (Schritt 3c erzwingt das).
+   Zwei Arme derselben Ebene koennen sich damit nie schneiden — auch nicht, wenn
+   "off" am Bildschirmrand gekappt wird: gleicher Versatz bei groesserem Abstand
+   ergibt zwangslaeufig den kleineren Winkel, die Reihenfolge bleibt erhalten.
+   Aus demselben Grund ueberlebt die Ordnung auch die vertikale Randkorrektur. */
+const MORE_CAP     = 6;    // Slots je Ebene inkl. "(Weitere Einträge)" (Referenz: Element 721)
+const ROW_GAP      = 8;    // Luft zwischen zwei Bubble-Zeilen
+/* Abstand C -> erste Zeile. Bewusst deutlich groesser als der Zeilenabstand: erst
+   dadurch bekommt die oberste Zeile trotz steilen Winkels einen grossen Versatz und
+   der Fächer oeffnet sichtbar auf, statt oben zu einer Doppelspalte zu verkleben.
+   Kostet keinen Mausweg — geklickt wird der Armanfang direkt am Cursor. */
+const DROP         = 32;
+const MARGIN       = 12;   // Sicherheitsabstand zum Rand der Stage
+const MIN_R        = 50;   // Mindestabstand C -> Innenkante einer Bubble
+const PHI_MIN      = 13;   // Grad: steilster Arm (unterste Zeile)
+const PHI_STEP     = 24;   // Grad: angestrebter Winkelabstand benachbarter Arme
+const PHI_SPAN_MIN = 26;   // Grad: minimale Fächeröffnung
+const PHI_SPAN_MAX = 68;   // Grad: maximale Fächeröffnung
+const VAL_SQ       = 18;   // gestauchter Minimal-Versatz für enge Seiten
+const SPREAD_MIN   = 44;   // Versatz, den eine Seite mindestens hergeben muss
+const D2R = Math.PI/180;
+
+/* Winkel je Zeile, gemessen gegen die Senkrechte durch C. Index 0 = oberste
+   Zeile = flachster Arm. Beide Seiten teilen sich dieselbe Liste (ueber kMax),
+   damit links und rechts exakt spiegelbildlich auffaechern. */
+function fanAngles(kMax){
+  const span=Math.max(PHI_SPAN_MIN, Math.min(PHI_SPAN_MAX, (kMax-1)*PHI_STEP));
+  if(kMax<=1) return [PHI_MIN+span/2];
+  const step=span/(kMax-1);
+  const a=[]; for(let r=0;r<kMax;r++) a.push(PHI_MIN+span-r*step);
+  return a;
+}
+
+/* Wie viele Slots traegt die Ebene an dieser Stelle? (Anspruch 7: Anzahl aus
+   freiem Raum ableiten.) Reicht die Hoehe nicht fuer MORE_CAP/2 Zeilen, blaettert
+   der Platzhalter den Rest — die Ebene laeuft nie unten aus dem Bild. */
+function slotsFor(C,bounds){
+  const rowH=bubbleH()+ROW_GAP, yMin=(bounds.yMin!=null?bounds.yMin:0);
+  const roomV=Math.max(bounds.h-MARGIN-C.y, C.y-yMin-MARGIN);
+  // Reserve fuer das Ausweichen vor Pfad-Bubbles (siehe Schritt 2b in layoutLevel)
+  const rows=Math.floor((roomV-DROP-2*rowH)/rowH);
+  return Math.max(2, Math.min(MORE_CAP, rows*2));
+}
+
+/* blockers: Rechtecke der bereits gezeichneten Pfad-Bubbles (Vorfahren). */
+function layoutLevel(C, items, bounds, blockers){
+  const N=items.length, H=bubbleH(), W=levelWidth(items);
+  const rowH=H+ROW_GAP, yMin=(bounds.yMin!=null?bounds.yMin:0);
+  const roomL=C.x-MARGIN, roomR=bounds.w-C.x-MARGIN;
+
+  // 1) Seitenaufteilung — eine Seite zaehlt nur, wenn sie die Bubble UND einen
+  //    ordentlichen Faecher traegt. Reicht es nicht, faechert die Ebene einseitig
+  //    auf: das wirkt gewollt, eine halb gequetschte zweite Seite nicht.
+  //    Reihenfolge bleibt: die erste Haelfte der Eintraege steht links.
+  const needSide=W+SPREAD_MIN, twoSided=(roomL>=needSide && roomR>=needSide);
+  let kL,kR;
+  if(twoSided){ kL=Math.ceil(N/2); kR=N-kL; }
+  else if(roomR>=roomL){ kL=0; kR=N; }
+  else { kL=N; kR=0; }
+  const kMax=Math.max(kL,kR);
+  // Beide Seiten teilen dieselbe Kappung. Sonst klemmt die engere Seite ihre Arme
+  // staerker als die weite und der Faecher waere nicht mehr spiegelbildlich.
+  const offMax=Math.max(VAL_SQ,(twoSided?Math.min(roomL,roomR):Math.max(roomL,roomR))-W);
+
+  // 2) Vertikale Richtung: dorthin, wo die Ebene vollstaendig hinpasst
+  const needH=DROP+kMax*rowH;
+  const roomDown=bounds.h-MARGIN-C.y, roomUp=C.y-yMin-MARGIN;
+  const vdir=(roomDown>=needH)?+1:((roomUp>=needH)?-1:(roomDown>=roomUp?+1:-1));
+
+  // 2b) Abstand zur ersten Zeile ggf. vergroessern, um Pfad-Bubbles auszuweichen.
+  //     Klickt man den Armanfang dicht an C, konvergiert die neue Ebene fast
+  //     deckungsgleich mit der vorigen — die Bubble des gewaehlten Eintrags liegt
+  //     dann genau in der ersten Zeilenspur. Die Ebene startet deshalb hinter ihr.
+  //     Winkel und Zeilenraster bleiben unberuehrt, der Faecher wandert nur nach
+  //     aussen; die Kette der Ebenen bleibt dadurch vollstaendig sichtbar.
+  let drop=DROP;
+  const bands=(blockers||[]).map(b=>{
+    const a=(b.y-C.y)*vdir, z=(b.y+b.h-C.y)*vdir;
+    return {lo:Math.min(a,z), hi:Math.max(a,z)};
+  }).sort((p,q)=>p.hi-q.hi);
+  bands.forEach(b=>{ if(b.hi>drop-ROW_GAP && b.lo<drop+H+ROW_GAP) drop=b.hi+ROW_GAP; });
+  drop=Math.min(drop, DROP+2*rowH);
+
+  // 3) Winkelfächer -> Positionen
+  const phis=fanAngles(kMax), out=[];
+  const place=(arr,side)=>{
     if(!arr.length) return;
-    const room=(side<0?roomL:roomR);
-    const valley=Math.max(VAL_SQ, Math.min(VALLEY_MIN, room-W));     // Tal ggf. stauchen (enge Seite)
-    const spread=Math.max(0, Math.min(SPREAD, (room-W)-valley));     // Spread so weit wie Platz reicht
-    arr.forEach((it,row)=>{
-      const t = kMax>1 ? row/(kMax-1) : 0;                 // 0 (oben) .. 1 (unten) – ueber kMax: Seiten spiegeln sich
-      const off = valley + spread*Math.pow(1-t, FAN_P);    // Innenkanten-Abstand zu C (oben groß, unten klein)
-      const innerX = C.x + side*off;
-      out.push({item:it, w:W, h:H, cx:innerX + side*W/2, cy:C.y+vdir*(drop+H/2+row*rowH)});  // EINHEITLICHE Breite W (Ebenen-Maximum): Innenkante (Arm) bleibt, Außenkante gleichgezogen
+    const offs=arr.map((it,r)=>{
+      const dy=drop+H/2+r*rowH;
+      let off=dy*Math.tan(phis[r]*D2R);
+      // 3a) Bubble darf C nicht bedraengen: Mindest-RADIUS statt Mindest-Versatz,
+      //     damit steile Arme nicht kuenstlich nach aussen gedrueckt werden.
+      if(off*off+dy*dy < MIN_R*MIN_R) off=Math.sqrt(Math.max(0, MIN_R*MIN_R-dy*dy));
+      // 3b) Rand: gemeinsame Kappung — betrifft zuerst die flachen oberen Zeilen
+      return Math.min(off, offMax);
+    });
+    // 3c) Versatz nie steigend — haelt die Winkelordnung auch nach Schritt 4 stabil
+    for(let r=1;r<offs.length;r++) offs[r]=Math.min(offs[r],offs[r-1]);
+    arr.forEach((it,r)=>{
+      const dy=drop+H/2+r*rowH, innerX=C.x+side*offs[r];
+      out.push({item:it, w:W, h:H, cx:innerX+side*W/2, cy:C.y+vdir*dy});
     });
   };
-  const chooseVdir=(kMax)=>{                             // Anspruch 7: freien Raum auch vertikal auswerten
-    const yMin=(bounds.yMin!=null?bounds.yMin:0);
-    const needH=drop+kMax*rowH;
-    const roomDown=bounds.h-m-C.y, roomUp=C.y-yMin-m;
-    vdir=(roomDown>=needH)?+1:((roomUp>=needH)?-1:(roomDown>=roomUp?+1:-1));
-  };
-  if(roomL>=needSide && roomR>=needSide){
-    // klassischer Halb/Halb-Split (Reihenfolge bleibt: erste Haelfte links)
-    const half=Math.ceil(N/2), kMax=Math.max(half, N-half);
-    chooseVdir(kMax);
-    placeSide(items.slice(0,half), -1, kMax); placeSide(items.slice(half), +1, kMax);
-  } else {
-    // Eine Seite eng: bei EINHEITLICHER Breite passt entweder W (+Minimal-Tal) oder nicht
-    const tightIsL=roomL<roomR;
-    const roomT=tightIsL?roomL:roomR;
-    const kT=(W+VAL_SQ<=roomT)?Math.floor(N/2):0;        // enge Seite bekommt die kleinere Haelfte
-    if(kT>0){
-      const kW=N-kT;
-      const leftArr = tightIsL ? items.slice(0,kT) : items.slice(0,kW);   // Reihenfolge bleibt: erste Eintraege links
-      const rightArr= tightIsL ? items.slice(kT)   : items.slice(kW);
-      const kMax=Math.max(kT,kW);
-      chooseVdir(kMax);
-      placeSide(leftArr, -1, kMax);
-      placeSide(rightArr, +1, kMax);
-    } else {
-      chooseVdir(N);
-      placeSide(items, tightIsL?+1:-1, N);                 // enge Seite unbrauchbar -> einseitig
-    }
-  }
-  // Rand-Korrektur: ganze Ebene verschieben statt Einzel-Clamp (erhält Zeilenabstände); Oberkante hat Prioritaet
-  const yMin2=(bounds.yMin!=null?bounds.yMin:0);
-  const shiftDown=Math.max(0, ...out.map(p=> yMin2+p.h/2-p.cy));
-  const shiftUp=Math.max(0, ...out.map(p=> p.cy+p.h/2-(bounds.h-m)));
-  const shift=(shiftDown>0)?shiftDown:-shiftUp;
-  out.forEach(p=>{
-    p.cy+=shift;
-    p.cx=Math.max(p.w/2+m, Math.min(bounds.w-p.w/2-m, p.cx));
-  });
+  place(items.slice(0,kL), -1);
+  place(items.slice(kL),   +1);
+
+  // 4) Randkorrektur vertikal: die GANZE Ebene verschieben, nie einzelne Bubbles —
+  //    so bleiben Zeilenraster und Fächerform erhalten. Die Verschiebung ist so
+  //    begrenzt, dass keine Zeile ueber C hinweg auf die andere Seite kippt.
+  const shiftDown=Math.max(0, ...out.map(p=> yMin+p.h/2-p.cy));
+  const shiftUp  =Math.max(0, ...out.map(p=> p.cy+p.h/2-(bounds.h-MARGIN)));
+  let shift=(shiftDown>0)?shiftDown:-shiftUp;
+  const shiftMax=Math.max(0, drop-4);
+  shift=(vdir>0)?Math.max(shift,-shiftMax):Math.min(shift,shiftMax);
+  if(shift) out.forEach(p=>{ p.cy+=shift; });
   return out;
 }
 
@@ -613,25 +674,38 @@ function buildLevels(bounds){
   if(state.ctxOpen){ C={x:state.ctxC.x, y:state.ctxC.y}; }
   else if(state.rootC){ C={x:state.rootC.x, y:state.rootC.y}; }
   else { C=tabAnchor(state.openTab); const edge=4; if(C.x<55)C.x=edge; else if(C.x>bounds.w-55)C.x=bounds.w-edge; }
-  const levels=[]; let prevRef=null, depth=0;
+  const levels=[]; let prevRef=null, depth=0, blockers=[];
   while(items){
     const selId=state.selection[depth]||null;
-    const isDeepest=!selId;                         // aktive, wählbare Ebene
+    // Die Slot-Zahl haengt an der EBENE, nicht daran, ob sie gerade aktiv ist:
+    // eine Ebene behaelt beim Hineinklicken exakt ihr Layout und ihre Seite,
+    // die gewaehlte Bubble bleibt also genau dort liegen, wo geklickt wurde.
+    const cap=slotsFor(C,bounds);
     let showItems=items;
-    if(isDeepest && items.length>MORE_CAP){
-      // Referenzverhalten (Element 721): feste MORE_CAP Slots inkl. Platzhalter; Platzhalter blättert zyklisch
-      const pageSize=MORE_CAP-1;                                  // echte Einträge je Seite
+    if(items.length>cap){
+      // Referenzverhalten (Element 721): feste cap Slots inkl. Platzhalter; Platzhalter blättert zyklisch
+      const pageSize=cap-1;                                       // echte Einträge je Seite
       const numPages=Math.ceil(items.length/pageSize);
-      const page=((state.morePage%numPages)+numPages)%numPages;
+      let page=(((state.pages[depth]||0)%numPages)+numPages)%numPages;
+      const selIdx=selId?items.findIndex(x=>x.id===selId):-1;     // Auswahl muss sichtbar bleiben
+      if(selIdx>=0) page=Math.floor(selIdx/pageSize);
       const start=page*pageSize;
       showItems=[{id:'__more__',label:'(Weitere Einträge '+(page+1)+'/'+numPages+')',_more:true,_page:page+1,_pages:numPages}].concat(items.slice(start,start+pageSize));
     }
-    const placements=layoutLevel(C,prevRef,showItems,bounds);
-    levels.push({C,prevRef,placements,selectedId:selId});
+    const placements=layoutLevel(C,showItems,bounds,blockers);
+    const selPlace=selId?placements.find(p=>p.item.id===selId):null;
+    // Vorfahren-Ebenen kollabieren auf den gewaehlten Pfad (Anspruch 1: der Arm der
+    // Unterebene verbindet mit dem zuvor gewaehlten Eintrag). Notwendig, damit sich
+    // die Arme VERSCHIEDENER Ebenen nicht kreuzen: die neue Ebene konvergiert dicht
+    // am Klickpunkt der vorigen und laege sonst deckungsgleich ueber deren Faecher.
+    // Gerechnet wird weiter mit ALLEN Eintraegen der Seite — so bleibt die gewaehlte
+    // Bubble in Groesse und Position exakt dort, wo sie angeklickt wurde.
+    levels.push({C,prevRef,placements:(selPlace?[selPlace]:placements),selectedId:selId});
     if(!selId) break;
-    const selPlace=placements.find(p=>p.item.id===selId);
     const selItem=selPlace?selPlace.item:null;
     if(!selItem||!selItem.children) break;
+    // Diese Pfad-Bubble bleibt stehen: die folgenden Ebenen weichen ihr aus
+    blockers=blockers.concat([{y:selPlace.cy-selPlace.h/2, h:selPlace.h}]);
     prevRef=C; C=state.clickC[depth]||{x:selPlace.cx,y:selPlace.cy};
     items=selItem.children; depth++;
   }
@@ -652,42 +726,10 @@ function mixWhite(hex,t){            // hex Richtung Weiss mischen (t=0..1)
   const m=c=>Math.round(c+(255-c)*t);
   return 'rgb('+m(r)+','+m(g)+','+m(b)+')';
 }
-const FRAME_PAD=10;                  // Polsterung des Fächerrahmens um Bubbles/C
-function convexHull(pts){            // Andrew Monotone Chain
-  pts=pts.slice().sort((a,b)=>a.x-b.x||a.y-b.y);
-  const cross=(o,a,b)=>(a.x-o.x)*(b.y-o.y)-(a.y-o.y)*(b.x-o.x);
-  const lo=[]; for(const p of pts){ while(lo.length>=2&&cross(lo[lo.length-2],lo[lo.length-1],p)<=0)lo.pop(); lo.push(p); }
-  const hi=[]; for(let i=pts.length-1;i>=0;i--){ const p=pts[i]; while(hi.length>=2&&cross(hi[hi.length-2],hi[hi.length-1],p)<=0)hi.pop(); hi.push(p); }
-  lo.pop(); hi.pop(); return lo.concat(hi);
-}
-function drawFrames(levels){
-  levels.forEach((lvl)=>{
-    if(!lvl.placements.length) return;
-    // Huellpunkte: alle Bubble-Ecken + Spitze bei C (um FRAME_PAD Richtung Faecher versetzt,
-    // damit die gepolsterte Rahmenspitze exakt in C endet und nicht in die Menueleiste ragt)
-    const avgY=lvl.placements.reduce((a,p)=>a+p.cy,0)/lvl.placements.length;
-    const tipDir=(avgY>=lvl.C.y)?+1:-1;
-    const pts=[{x:lvl.C.x, y:lvl.C.y+tipDir*FRAME_PAD}];
-    lvl.placements.forEach(p=>{
-      const l=p.cx-p.w/2, r=p.cx+p.w/2, t=p.cy-p.h/2, b2=p.cy+p.h/2;
-      pts.push({x:l,y:t},{x:r,y:t},{x:r,y:b2},{x:l,y:b2});
-    });
-    const h=convexHull(pts);
-    const d='M '+h.map(q=>n(q.x)+' '+n(q.y)).join(' L ')+' Z';
-    const fg=document.createElementNS(NS,'g'); fg.setAttribute('class','frame');
-    const p1=document.createElementNS(NS,'path'); p1.setAttribute('d',d);
-    p1.setAttribute('class','f-border'); p1.setAttribute('stroke-width', String(2*FRAME_PAD+2));
-    const p2=document.createElementNS(NS,'path'); p2.setAttribute('d',d);
-    p2.setAttribute('class','f-fill'); p2.setAttribute('stroke-width', String(2*FRAME_PAD));
-    fg.appendChild(p1); fg.appendChild(p2);
-    armsSvg.appendChild(fg);                       // Frames zuerst -> liegen unter allen Call-outs
-  });
-}
 function drawCallout(bounds,opts){
   for(const k in itemReg) delete itemReg[k];
   const anim=opts.animateDeepest||false;
   const levels=buildLevels(bounds);
-  drawFrames(levels);
   const flat=[]; levels.forEach((lvl,li)=>lvl.placements.forEach(p=>flat.push({lvl,li,p})));
   flat.sort((a,b)=>(a.p.cy-b.p.cy)||(a.li-b.li));
   flat.forEach(({lvl,li,p})=>{
@@ -695,11 +737,12 @@ function drawCallout(bounds,opts){
     g.setAttribute('class',classFor(lvl,p,li,levels,anim));
     g.dataset.level=li; g.dataset.id=p.item.id; itemReg[li+':'+p.item.id]=p.item;
     if(p.item.id===lvl.selectedId){
-      // Auswahlpfad: aktuellste Auswahl kraeftig, Vorfahren stufenweise heller (18 %/Stufe, max 50 %)
+      // Auswahlpfad: jede sichtbare Auswahl-Bubble ist ein VORFAHR der aktiven Ebene
+      // und muss hinter ihr zurueckweichen — je weiter zurueck, desto blasser.
       const step=Math.max(0,(state.selection.length-1)-li);
-      const t=Math.min(0.5, step*0.18);
-      if(t>0) g.style.setProperty('--selfill', mixWhite('#0078d7', t));
-      if(step>=2) g.style.setProperty('--sellabel','var(--sel-deep)');
+      const t=Math.min(0.62, 0.26+step*0.16);
+      g.style.setProperty('--selfill', mixWhite('#0078d7', t));
+      if(t>=0.34) g.style.setProperty('--sellabel','var(--sel-deep)');
     } else if(lvl.selectedId){
       // Nicht gewaehlte Geschwister: je weiter hinter der aktiven Ebene, desto blasser
       const dist=Math.max(1, state.selection.length-li);
@@ -710,16 +753,18 @@ function drawCallout(bounds,opts){
     path.setAttribute('class','co-body'); g.appendChild(path);
     g.dataset.cx=n(lvl.C.x); g.dataset.cy=n(lvl.C.y);
     const armX=(lvl.C.x>=p.cx)?p.cx+p.w/2:p.cx-p.w/2; g.dataset.ax=n(armX); g.dataset.ay=n(p.cy);
+    g.dataset.bx=n(p.cx-p.w/2); g.dataset.by=n(p.cy-p.h/2); g.dataset.bw=n(p.w); g.dataset.bh=n(p.h);
     const chev=showsChevron(p.item);
     const t=document.createElementNS(NS,'text');
-    t.setAttribute('x',chev?p.cx-7:p.cx); t.setAttribute('y',p.cy);
+    t.setAttribute('x',chev?p.cx-CHEV_W/2:p.cx); t.setAttribute('y',p.cy);
     t.setAttribute('text-anchor','middle'); t.setAttribute('dominant-baseline','central');
     t.setAttribute('class','co-label'); t.textContent=itemLabel(p.item); g.appendChild(t);
     if(chev){ const ch=document.createElementNS(NS,'text');
-      ch.setAttribute('x',p.cx+p.w/2-11); ch.setAttribute('y',p.cy+1);
+      ch.setAttribute('x',p.cx+p.w/2-PAD_X); ch.setAttribute('y',p.cy+1);
       ch.setAttribute('text-anchor','middle'); ch.setAttribute('dominant-baseline','central');
       ch.setAttribute('class','co-chevron'); ch.textContent='\u25B6'; g.appendChild(ch); }
-    g.addEventListener('click',ev=>{ ev.stopPropagation(); onItemClick(li,p.item,toStage(ev)); });
+    g.addEventListener('click',ev=>{ ev.stopPropagation(); const pt=toStage(ev);
+      const hit=pickCallout(pt); onItemClick(hit?hit.li:li, hit?hit.item:p.item, pt); });
     g.addEventListener('mouseenter',()=>{ setHover(li,p.item);
       // Hover-Raise nur bis an die Spitze der EIGENEN Ebene – tiefere (aktive) Ebenen behalten Prioritaet
       const next=[...armsSvg.querySelectorAll('g.callout:not([visibility])')].find(o=>+o.dataset.level>li);
@@ -734,10 +779,45 @@ function drawCallout(bounds,opts){
     armsSvg.querySelectorAll('g.callout[data-level="'+d+'"]').forEach(g=>armsSvg.appendChild(g)); }
 }
 
+/* ===================== TREFFERAUSWERTUNG: RICHTUNG STATT STAPELREIHENFOLGE =====================
+   Die Arme einer Ebene laufen zwangslaeufig in C zusammen; im Umfeld von C liegen
+   deshalb mehrere Armflaechen uebereinander. Wuerde dort die Zeichenreihenfolge
+   entscheiden, bekaeme der Nutzer einen anderen Eintrag als den, auf den er zeigt.
+   Regel: (1) tiefste (aktive) Ebene gewinnt, (2) ein Treffer in der Bubble selbst
+   schlaegt jeden Armtreffer, (3) in der Armzone gewinnt der Arm, dessen Achse dem
+   Klickstrahl aus C am naechsten liegt. */
+function pickCallout(pt){
+  const pointIn=(g)=>{
+    const path=g.querySelector('path.co-body'); if(!path||!path.isPointInFill) return false;
+    try{ return path.isPointInFill(new DOMPoint(pt.x,pt.y)); }catch(e){ return false; }
+  };
+  const hits=[...armsSvg.querySelectorAll('g.callout')].filter(g=>!g.hasAttribute('visibility')&&pointIn(g));
+  if(!hits.length) return null;
+  const deepest=Math.max(...hits.map(g=>+g.dataset.level));
+  const cand=hits.filter(g=>+g.dataset.level===deepest);
+  const inBubble=cand.find(g=>{
+    const bx=+g.dataset.bx, by=+g.dataset.by;
+    return pt.x>=bx && pt.x<=bx+ +g.dataset.bw && pt.y>=by && pt.y<=by+ +g.dataset.bh;
+  });
+  const pickAngle=()=>{
+    let best=null, bestD=Infinity;
+    cand.forEach(g=>{
+      const C={x:+g.dataset.cx,y:+g.dataset.cy};
+      const click=Math.atan2(pt.x-C.x, pt.y-C.y), arm=Math.atan2(+g.dataset.ax-C.x, +g.dataset.ay-C.y);
+      let d=Math.abs(click-arm); if(d>Math.PI) d=2*Math.PI-d;
+      if(d<bestD){ bestD=d; best=g; }
+    });
+    return best;
+  };
+  const g=inBubble||pickAngle(); if(!g) return null;
+  const item=itemReg[g.dataset.level+':'+g.dataset.id];
+  return item?{li:+g.dataset.level, item:item, g:g}:null;
+}
+
 /* ============================== INTERAKTION + STATUS ============================== */
 function render(opts){ opts=opts||{};
   const s=stageRect(), tb=tabbar.getBoundingClientRect(), bounds={w:s.width,h:s.height,yMin:tb.bottom-s.top+2};
-  [...armsSvg.querySelectorAll('g.callout,g.frame')].forEach(e=>e.remove());
+  [...armsSvg.querySelectorAll('g.callout')].forEach(e=>e.remove());
   if(isOpen()) drawCallout(bounds,opts);
   tabbar.querySelectorAll('.tab').forEach(t=>t.classList.toggle('open', !state.ctxOpen && t.dataset.tab===state.openTab));
   hintEl.style.display=isOpen()?'none':'block';
@@ -748,7 +828,7 @@ function onTabClick(tabId, pt){
   CMP.closeClassic(true);
   if(!state.ctxOpen && state.openTab===tabId){ closeMenu(); return; }
   state.ctxOpen=false; state.ctxC=null;
-  state.openTab=tabId; state.selection=[]; state.clickC=[]; state.morePage=0;
+  state.openTab=tabId; state.selection=[]; state.clickC=[]; state.pages=[];
   state.rootC = (pt && pt.x>0 && pt.y>0) ? {x:pt.x, y:pt.y} : null;   // Kays Punkt #2: C = Klickpunkt; Guard gegen koordinatenlose (synthetische) Klicks
   CMP.start('callout', state.rootC);
   render({animateDeepest:true});
@@ -757,21 +837,22 @@ function openContext(pt){
   if(CMP.mode==='classic'){ CMP.openClassicCtx(pt); return; }
   CMP.closeClassic(true);
   state.openTab=null; state.ctxOpen=true; state.ctxC={x:pt.x,y:pt.y};
-  state.selection=[]; state.clickC=[]; state.applied=null; state.morePage=0;
+  state.selection=[]; state.clickC=[]; state.applied=null; state.pages=[];
   CMP.start('callout', state.ctxC);
   render({animateDeepest:true});
 }
 function onItemClick(li,item,clickPt){
   if(clickPt && clickPt.x>0 && clickPt.y>0) CMP.leg(clickPt);          // nummerierter Wegpunkt je Interaktion
   if(item._more){
-    state.morePage++;
+    state.pages[li]=(state.pages[li]||0)+1;                    // nur DIESE Ebene blättert weiter
+    state.pages.length=li+1;                                   // tiefere Ebenen beginnen wieder auf Seite 1
     if(clickPt && clickPt.x>0 && clickPt.y>0){                 // Blättern = Navigation: Ebene konvergiert neu am Klickpunkt
       if(li===0){ if(state.ctxOpen) state.ctxC={x:clickPt.x, y:clickPt.y}; else state.rootC={x:clickPt.x, y:clickPt.y}; }
       else state.clickC[li-1]={x:clickPt.x, y:clickPt.y};
     }
     clearHover(); render({animateDeepest:true}); return;
   }  // Mehr -> nächste Seite (zyklisch)
-  state.morePage=0;                                                                          // echte Navigation startet auf Seite 1
+  state.pages=state.pages.slice(0,li+1);      // eigene Seite behalten, tiefere zurücksetzen
   const isLeaf=!item.children;
   if(isLeaf){
     state.selection=state.selection.slice(0,li); state.clickC=state.clickC.slice(0,li);
@@ -783,7 +864,7 @@ function onItemClick(li,item,clickPt){
   state.selection[li]=item.id; if(clickPt)state.clickC[li]=clickPt;
   clearHover(); render({animateDeepest:true});
 }
-function closeMenu(){ state.openTab=null; state.ctxOpen=false; state.ctxC=null; state.selection=[]; state.clickC=[]; state.hoverId=null; state.morePage=0; state.rootC=null; if(typeof CMP!=='undefined'){CMP.cancel(); if(!state.playing)CMP.clearTrail();} render(); }
+function closeMenu(){ state.openTab=null; state.ctxOpen=false; state.ctxC=null; state.selection=[]; state.clickC=[]; state.hoverId=null; state.pages=[]; state.rootC=null; if(typeof CMP!=='undefined'){CMP.cancel(); if(!state.playing)CMP.clearTrail();} render(); }
 
 function setHover(li,item){ state.hoverId=li+':'+item.id;
   armsSvg.querySelectorAll('g.callout').forEach(g=>g.classList.toggle('hover',(g.dataset.level+':'+g.dataset.id)===state.hoverId)); }
@@ -1078,15 +1159,14 @@ stage.addEventListener('mousedown',function(ev){
   const t=ev.target;
   if(!(t===armsSvg || (t.closest && t.closest('#armsSvg')))) return;  // direkter Tab-Klick: normaler Weg
   const pt=toStage(ev);
-  const gEl=(t.closest && t.closest('g.callout'))||null;
   // Toggle-Zone: nur in unmittelbarer Naehe des Konvergenzpunkts C gewinnt der Tab (dort ist das Buendel ohnehin mehrdeutig)
   const g0=armsSvg.querySelector('g.callout:not([visibility])');
   const nearC=!!g0 && Math.hypot(pt.x-(+g0.dataset.cx), pt.y-(+g0.dataset.cy))<=12;
   ev.preventDefault(); ev.stopPropagation();
   suppressNextClick=true; suppressClickUntil=performance.now()+150; // nur den Click DERSELBEN Geste schlucken
-  if(gEl && !gEl.hasAttribute('visibility') && !nearC){
-    const item=itemReg[gEl.dataset.level+':'+gEl.dataset.id];
-    if(item){ onItemClick(+gEl.dataset.level, item, pt); return; }
+  if(!nearC){
+    const hit=pickCallout(pt);
+    if(hit){ onItemClick(hit.li, hit.item, pt); return; }
   }
   const tEl=[...tabbar.querySelectorAll('.tab')].find(el=>{const r=el.getBoundingClientRect(); return ev.clientX>=r.left&&ev.clientX<=r.right;});
   if(tEl) onTabClick(tEl.dataset.tab, pt);
