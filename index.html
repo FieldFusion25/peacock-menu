@@ -408,7 +408,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
           <figure class="lv-shot">
             <img src="assets/vergleich-klassisch.png" alt="Aufzeichnung aus dem Prototyp: klassische Kaskadennavigation Einfügen, Diagramm, Säule, Gestapelt — langer, nummerierter Mausweg durch drei Untermenüs" loading="lazy">
           </figure>
-          <div class="lv-step-label">Gemessener Mausweg: <b>534&#8201;px</b> · 4 Klicks — Einfügen &#8594; Diagramm &#8594; Säule &#8594; Gestapelt</div>
+          <div class="lv-step-label">Gemessener Mausweg: <b>573&#8201;px</b> · 4 Klicks — Einfügen &#8594; Diagramm &#8594; Säule &#8594; Gestapelt</div>
         </div>
         <!-- Peacock Menu: identischer Vorgang, Klicks am Armanfang nahe dem Konvergenzpunkt -->
         <div class="lv-col" data-side="peacock">
@@ -417,9 +417,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
             <span class="lv-sub">Patentierte Navigation</span>
           </div>
           <figure class="lv-shot">
-            <img src="assets/vergleich-peacock.png" alt="Aufzeichnung aus dem Prototyp: Peacock Menu, identischer Vorgang — jede Ebene öffnet exakt am Klickpunkt, minimaler Mausweg, Messpanel zeigt 90 Prozent Ersparnis" loading="lazy">
+            <img src="assets/vergleich-peacock.png" alt="Aufzeichnung aus dem Prototyp: Peacock Menu, identischer Vorgang — jede Ebene öffnet exakt am Klickpunkt, minimaler Mausweg, Messpanel zeigt 91 Prozent Ersparnis" loading="lazy">
           </figure>
-          <div class="lv-step-label">Gemessener Mausweg: <b>54&#8201;px</b> · 4 Klicks — identischer Vorgang, Klicks am Armanfang</div>
+          <div class="lv-step-label">Gemessener Mausweg: <b>49&#8201;px</b> · 4 Klicks — identischer Vorgang, Klicks am Armanfang</div>
         </div>
       </div>
       <p class="lv-repro">Echte Aufzeichnungen aus dem interaktiven Prototyp — jederzeit selbst reproduzierbar über <b>&#9654; Play</b> im Vergleichspanel der <a href="#demo">Live-Demo</a>.</p>
@@ -643,10 +643,12 @@ footer .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
     revealEls.forEach(function(el){ el.classList.add("in"); });
   }
 
-  /* Vergleich: feste, im Prototyp gemessene Werte (Play-Ablauf, Reiter-Szenario:
-     Klassisch 534 px vs. Peacock Menu 54 px Mausweg; Zeit manuell gemessen 2,3 s vs. 1,6 s) */
+  /* Vergleich: die Werte aus den beiden Aufzeichnungen oben (Play-Ablauf,
+     Reiter-Szenario: klassisch 573 px vs. Peacock Menu 49 px Mausweg).
+     Beide Bilder stammen aus EINEM Messlauf, der klassische Wert ist deshalb
+     in beiden derselbe. Zeit manuell gemessen: 2,3 s vs. 1,6 s. */
   (function(){
-    var PATH_RED = 90;      // % weniger Mausweg
+    var PATH_RED = 91;      // % weniger Mausweg
     var TIME_RED = 30;      // % schnellere Navigation
     var SAVED_S  = 0.7;     // Sekunden Ersparnis je Vorgang
     var el = function(id){ return document.getElementById(id); };

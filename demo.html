@@ -137,17 +137,18 @@ table.grid tr.subtotal td,table.grid tr.subtotal th{font-weight:700;background:#
 g.callout{cursor:pointer;pointer-events:auto;filter:drop-shadow(0 2px 4px rgba(0,0,0,.16))}
 g.callout .co-body{fill:#fff;stroke:#c7cdc9;stroke-width:1;transition:fill .12s,stroke .12s,stroke-width .12s}
 g.callout .co-label{fill:var(--ink);font:400 12px var(--font);pointer-events:none}
+g.callout .co-ico{fill:var(--ink-soft);font-size:11.5px;pointer-events:none}
 g.callout .co-chevron{fill:#445;font-size:9px;font-weight:700;pointer-events:none}
 g.callout:not(.selected):hover .co-body,g.callout.hover:not(.selected) .co-body{fill:var(--hov);stroke:var(--hov-line);stroke-width:1}
 g.callout:not(.selected):hover .co-label,g.callout.hover:not(.selected) .co-label{fill:var(--ink)}
 g.callout:not(.selected):hover .co-chevron,g.callout.hover:not(.selected) .co-chevron{fill:#445}
 g.callout.selected .co-body{fill:var(--selfill,var(--sel));stroke:var(--selfill,var(--sel))}
 g.callout.selected .co-label{fill:var(--sellabel,#fff)}
-g.callout.selected .co-chevron{fill:var(--sellabel,#ffffff)}
+g.callout.selected .co-ico,g.callout.selected .co-chevron{fill:var(--sellabel,#ffffff)}
 g.callout.dimmed{filter:none;opacity:var(--dimop,.42)}
 g.callout.dimmed:hover{opacity:.85}
 g.callout.dimmed .co-body{fill:#eef1f5;stroke:#dde3ea}
-g.callout.dimmed .co-label{fill:#9aa3af}
+g.callout.dimmed .co-label,g.callout.dimmed .co-ico{fill:#9aa3af}
 /* "Mehr"-Pager: gestrichelt + kursiv, klar als Blätter-Element erkennbar */
 g.callout.more:not(.dimmed) .co-body{fill:#ffffff;stroke:#7e8798;stroke-dasharray:4 3;stroke-width:1.4}
 g.callout.more .co-label{font-style:italic;fill:#5b6675;font-weight:400}
@@ -167,6 +168,7 @@ g.callout.appear{animation:rise .18s ease both}
 /* Statusleiste */
 .statusbar{display:flex;align-items:center;gap:0;height:22px;padding:0 4px;background:var(--chrome-2);border-top:1px solid var(--line);font-size:11.5px;color:#5a5f66}
 .statusbar #statusbar{padding:0 8px}
+.statusbar .desc{color:var(--ink)}
 .statusbar .muted{color:#6b7076}
 .statusbar .ok{color:var(--xl-deep);font-weight:700}
 .statusbar .sp{flex:1}
@@ -299,24 +301,27 @@ const TREE = {
     ]}
   ]},
   einfuegen:{label:'Einfügen', children:[
-    {id:'zellen',label:'Zellen…',ico:'▦'},
-    {id:'tabelle',label:'Tabelle…'},
-    {id:'pivot',label:'Pivot-Tabelle…',ico:'⊞'},
-    {id:'diagramm',label:'Diagramm',ico:'📊', children:[
-      {id:'saeule',label:'Säule', children:[
-        {id:'sg',label:'Gruppiert'},{id:'ss',label:'Gestapelt'},{id:'s100',label:'100 % gestapelt'},{id:'s3d',label:'3-D'}
+    {id:'zellen',label:'Zellen…',ico:'▦',desc:'Fügt leere Zellen ein und verschiebt die bestehenden'},
+    {id:'tabelle',label:'Tabelle…',desc:'Fügt der Arbeitsmappe ein weiteres Tabellenblatt hinzu'},
+    {id:'pivot',label:'Pivot-Tabelle…',ico:'⊞',desc:'Wertet den markierten Bereich zusammenfassend aus'},
+    {id:'diagramm',label:'Diagramm',ico:'📊',desc:'Stellt die markierten Daten grafisch dar', children:[
+      {id:'saeule',label:'Säule',desc:'Vergleicht Werte über Kategorien hinweg', children:[
+        {id:'sg',label:'Gruppiert',desc:'Stellt die Reihen nebeneinander'},
+        {id:'ss',label:'Gestapelt',desc:'Stapelt die Reihen zur Gesamtsumme'},
+        {id:'s100',label:'100 % gestapelt',desc:'Zeigt die Anteile je Kategorie'},
+        {id:'s3d',label:'3-D',desc:'Räumliche Darstellung der Säulen'}
       ]},
-      {id:'balken',label:'Balken', children:[
+      {id:'balken',label:'Balken',desc:'Waagerechte Säulen, gut für lange Beschriftungen', children:[
         {id:'bg',label:'Gruppiert'},{id:'bs',label:'Gestapelt'},{id:'b100',label:'100 % gestapelt'},{id:'b3d',label:'3-D'}
       ]},
-      {id:'linie',label:'Linie', children:[
+      {id:'linie',label:'Linie',desc:'Zeigt Verläufe über die Zeit', children:[
         {id:'lg',label:'Glatt'},{id:'lp',label:'Mit Punkten'},{id:'lst',label:'Gestapelt'}
       ]},
-      {id:'kreis',label:'Kreis', children:[
+      {id:'kreis',label:'Kreis',desc:'Zeigt Anteile an einem Ganzen', children:[
         {id:'k2',label:'2-D'},{id:'k3',label:'3-D'},{id:'kr',label:'Ring'}
       ]}
     ]},
-    {id:'funktion',label:'Funktion…',ico:'ƒ'},
+    {id:'funktion',label:'Funktion…',ico:'ƒ',desc:'Öffnet den Assistenten für Tabellenfunktionen'},
     {id:'bild',label:'Bild', children:[
       {id:'bdatei',label:'Aus Datei…'},{id:'formen',label:'Formen'},{id:'smart',label:'Fontwork'}
     ]},
@@ -380,19 +385,24 @@ const TAB_ORDER=['datei','bearbeiten','ansicht','einfuegen','format','vorlagen',
 
 /* Kontextmenü (Rechtsklick auf eine Zelle) */
 const CTX={ label:'Kontextmenü', children:[
-  {id:'cut',label:'Ausschneiden',ico:'✂'},
-  {id:'copy',label:'Kopieren',ico:'⧉'},
-  {id:'paste',label:'Einfügen',ico:'📋'},
-  {id:'einfopt',label:'Inhalte einfügen', children:[
-    {id:'werte',label:'Werte'},{id:'formate',label:'Formate'},{id:'verknuepf',label:'Verknüpfen'}
+  {id:'cut',label:'Ausschneiden',ico:'✂',desc:'Verschiebt die Auswahl in die Zwischenablage'},
+  {id:'copy',label:'Kopieren',ico:'⧉',desc:'Legt die Auswahl in der Zwischenablage ab'},
+  {id:'paste',label:'Einfügen',ico:'📋',desc:'Setzt den Inhalt der Zwischenablage ein'},
+  {id:'einfopt',label:'Inhalte einfügen',desc:'Einfügen mit Auswahl, was übernommen wird', children:[
+    {id:'werte',label:'Werte',desc:'Nur die Ergebnisse, ohne Formeln'},
+    {id:'formate',label:'Formate',desc:'Nur die Formatierung'},
+    {id:'verknuepf',label:'Verknüpfen',desc:'Verweis auf die Quellzellen'}
   ]},
-  {id:'format',label:'Zellen formatieren', children:[
-    {id:'waehrung',label:'Währung'},{id:'prozent',label:'Prozent'},{id:'datum',label:'Datum'},{id:'text',label:'Text'}
+  {id:'format',label:'Zellen formatieren',desc:'Legt fest, wie die Werte dargestellt werden', children:[
+    {id:'waehrung',label:'Währung',desc:'Mit Währungssymbol und zwei Nachkommastellen'},
+    {id:'prozent',label:'Prozent',desc:'Multipliziert mit 100 und hängt % an'},
+    {id:'datum',label:'Datum',desc:'Zahl als Kalenderdatum darstellen'},
+    {id:'text',label:'Text',desc:'Inhalt unverändert als Text behandeln'}
   ]},
-  {id:'filter',label:'Filter', children:[
+  {id:'filter',label:'Filter',desc:'Blendet Zeilen nach einem Kriterium aus', children:[
     {id:'wert',label:'Nach Wert'},{id:'farbe',label:'Nach Farbe'}
   ]},
-  {id:'kommentar',label:'Kommentar einfügen'}
+  {id:'kommentar',label:'Kommentar einfügen',desc:'Hängt der Zelle eine Notiz an'}
 ]};
 
 TAB_ORDER.forEach(id=>{
@@ -436,7 +446,7 @@ TAB_ORDER.forEach(id=>{
 /* ============================== ZUSTAND ============================== */
 /* pages[] = Blätterseite JE EBENE (nicht global): eine Ebene behält ihre Seite,
    wenn man in einen ihrer Einträge hineinnavigiert. */
-const state={ openTab:null, selection:[], clickC:[], hoverId:null, applied:null, ctxOpen:false, ctxC:null, playing:false, pages:[], rootC:null };
+const state={ openTab:null, selection:[], clickC:[], hoverId:null, hoverDesc:null, applied:null, ctxOpen:false, ctxC:null, playing:false, pages:[], rootC:null };
 
 /* ============================== GEOMETRIE (unveränderte Call-out-Engine) ============================== */
 function stageRect(){ return stage.getBoundingClientRect(); }
@@ -458,15 +468,23 @@ measureG.appendChild(measureText);
 const wcache={};
 function ensureMeasure(){ if(!measureG.isConnected) armsSvg.appendChild(measureG); }
 function labelWidth(s){ if(wcache[s]!=null)return wcache[s]; ensureMeasure(); measureText.textContent=s; const w=measureText.getBBox().width; wcache[s]=w; return w; }
-let BUBBLE_H=null; const PAD_X=11, PAD_Y=6, CHEV_W=16;
+let BUBBLE_H=null; const PAD_X=11, PAD_Y=6, CHEV_W=16, ICO_W=15, ICO_GAP=5;
 function bubbleH(){ if(BUBBLE_H==null){ ensureMeasure(); measureText.textContent='Ag'; BUBBLE_H=measureText.getBBox().height+PAD_Y*2; } return BUBBLE_H; }
 function bubbleW(label){ return labelWidth(label)+PAD_X*2; }
 function showsChevron(it){ return !!it.children; }
 function itemLabel(it){ return it.label; }
+function itemIcon(it){ return it.ico||''; }
+/* Symbol + Text bilden je Blase eine mittig sitzende Einheit (Anspruch 6: Blase
+   enthaelt Textlabel und/oder Symbol). Keine feste Symbolspalte wie in einer
+   Menueliste: eine Sprechblase steht fuer sich, eine linksbuendige Spalte risse
+   nur eine Luecke zwischen Symbol und Text auf. */
+function itemContentW(it){ return labelWidth(itemLabel(it))+(itemIcon(it)?ICO_W+ICO_GAP:0); }
 /* Einheitliche Bubble-Breite einer Ebene: das Maximum ueber alle angezeigten
-   Eintraege (inkl. Platz fuer den Untermenue-Chevron). Jede Bubble derselben
-   Ebene bekommt exakt diese Breite — die Groesse folgt dem laengsten Label. */
-function levelWidth(items){ return Math.max.apply(null, items.map(it=> bubbleW(itemLabel(it))+(showsChevron(it)?CHEV_W:0))); }
+   Eintraege (inkl. Symbol und Platz fuer den Untermenue-Chevron). Jede Bubble
+   derselben Ebene bekommt exakt diese Breite. */
+function levelWidth(items){
+  return Math.max.apply(null, items.map(it=> itemContentW(it)+PAD_X*2+(showsChevron(it)?CHEV_W:0)));
+}
 
 const CR=0;             // Eckradius der Bubbles (0 = eckig; wirkt nur, wo kein Arm-Ansatz liegt)
 const ARM_T=11;         // KONSTANTE Armdicke (senkrecht zur Armachse) – ueberall gleich, gut klickbar
@@ -668,12 +686,20 @@ function layoutLevel(C, items, bounds, blockers){
 function activeRoot(){ if(state.ctxOpen) return CTX; if(state.openTab&&TREE[state.openTab]) return TREE[state.openTab]; return null; }
 function isOpen(){ return state.ctxOpen || !!(state.openTab&&TREE[state.openTab]); }
 
+/* Der Konvergenzpunkt ist ein GESPEICHERTER Klickpunkt. Wird das Fenster danach
+   verkleinert, kann er ausserhalb der Stage liegen — dann muss er hineingezogen
+   werden, sonst konvergiert der Faecher auf einen Punkt ausserhalb des Bildes.
+   Beim Klick selbst liegt der Punkt immer innen, die Kappung greift dort nicht. */
+function clampC(C,bounds){
+  return { x:Math.max(2, Math.min(bounds.w-2, C.x)), y:Math.max(2, Math.min(bounds.h-2, C.y)) };
+}
 function buildLevels(bounds){
   const root=activeRoot(); if(!root) return [];
   let items=root.children, C;
   if(state.ctxOpen){ C={x:state.ctxC.x, y:state.ctxC.y}; }
   else if(state.rootC){ C={x:state.rootC.x, y:state.rootC.y}; }
   else { C=tabAnchor(state.openTab); const edge=4; if(C.x<55)C.x=edge; else if(C.x>bounds.w-55)C.x=bounds.w-edge; }
+  C=clampC(C,bounds);
   const levels=[]; let prevRef=null, depth=0, blockers=[];
   while(items){
     const selId=state.selection[depth]||null;
@@ -706,7 +732,7 @@ function buildLevels(bounds){
     if(!selItem||!selItem.children) break;
     // Diese Pfad-Bubble bleibt stehen: die folgenden Ebenen weichen ihr aus
     blockers=blockers.concat([{y:selPlace.cy-selPlace.h/2, h:selPlace.h}]);
-    prevRef=C; C=state.clickC[depth]||{x:selPlace.cx,y:selPlace.cy};
+    prevRef=C; C=clampC(state.clickC[depth]||{x:selPlace.cx,y:selPlace.cy}, bounds);
     items=selItem.children; depth++;
   }
   return levels;
@@ -754,9 +780,19 @@ function drawCallout(bounds,opts){
     g.dataset.cx=n(lvl.C.x); g.dataset.cy=n(lvl.C.y);
     const armX=(lvl.C.x>=p.cx)?p.cx+p.w/2:p.cx-p.w/2; g.dataset.ax=n(armX); g.dataset.ay=n(p.cy);
     g.dataset.bx=n(p.cx-p.w/2); g.dataset.by=n(p.cy-p.h/2); g.dataset.bw=n(p.w); g.dataset.bh=n(p.h);
-    const chev=showsChevron(p.item);
+    // Symbol und Text mittig als Einheit; der Chevron nimmt rechts Platz weg und
+    // schiebt die Einheit entsprechend nach links.
+    const chev=showsChevron(p.item), ico=itemIcon(p.item);
+    const labW=labelWidth(itemLabel(p.item)), icoW=ico?ICO_W+ICO_GAP:0;
+    const startX=p.cx-(chev?CHEV_W:0)/2-(labW+icoW)/2;
+    if(ico){
+      const ic=document.createElementNS(NS,'text');
+      ic.setAttribute('x',startX+ICO_W/2); ic.setAttribute('y',p.cy+1);
+      ic.setAttribute('text-anchor','middle'); ic.setAttribute('dominant-baseline','central');
+      ic.setAttribute('class','co-ico'); ic.textContent=ico; g.appendChild(ic);
+    }
     const t=document.createElementNS(NS,'text');
-    t.setAttribute('x',chev?p.cx-CHEV_W/2:p.cx); t.setAttribute('y',p.cy);
+    t.setAttribute('x',startX+icoW+labW/2); t.setAttribute('y',p.cy);
     t.setAttribute('text-anchor','middle'); t.setAttribute('dominant-baseline','central');
     t.setAttribute('class','co-label'); t.textContent=itemLabel(p.item); g.appendChild(t);
     if(chev){ const ch=document.createElementNS(NS,'text');
@@ -866,14 +902,32 @@ function onItemClick(li,item,clickPt){
 }
 function closeMenu(){ state.openTab=null; state.ctxOpen=false; state.ctxC=null; state.selection=[]; state.clickC=[]; state.hoverId=null; state.pages=[]; state.rootC=null; if(typeof CMP!=='undefined'){CMP.cancel(); if(!state.playing)CMP.clearTrail();} render(); }
 
-function setHover(li,item){ state.hoverId=li+':'+item.id;
-  armsSvg.querySelectorAll('g.callout').forEach(g=>g.classList.toggle('hover',(g.dataset.level+':'+g.dataset.id)===state.hoverId)); }
-function clearHover(){ state.hoverId=null; armsSvg.querySelectorAll('g.callout').forEach(g=>g.classList.remove('hover')); }
+/* Anspruch 10: Beschreibung, sobald Arm ODER Blase unter dem Zeiger liegt. Sie
+   erscheint in der Statuszeile — dort zeigt LibreOffice seine Menuebeschreibungen
+   ebenfalls an. Traegt der Eintrag keinen eigenen Text, wird die Beschreibung aus
+   dem Pfad und der Art des Eintrags gebildet, damit JEDER Eintrag eine hat. */
+function itemDesc(li,item){
+  if(item._more) return 'Zeigt die nächste Seite dieser Menüebene (Seite '+item._page+' von '+item._pages+')';
+  const path=calloutLabels().slice(0,li+1).concat(itemLabel(item)).join(' → ');
+  if(item.desc) return item.desc+'  ·  '+path;
+  return path+(item.children?'  ·  Untermenü mit '+item.children.length+' Einträgen'
+                            :'  ·  Befehl ausführen');
+}
+function setHover(li,item){ state.hoverId=li+':'+item.id; state.hoverDesc=itemDesc(li,item);
+  armsSvg.querySelectorAll('g.callout').forEach(g=>g.classList.toggle('hover',(g.dataset.level+':'+g.dataset.id)===state.hoverId));
+  updateStatus(); }
+function clearHover(){ state.hoverId=null; state.hoverDesc=null;
+  armsSvg.querySelectorAll('g.callout').forEach(g=>g.classList.remove('hover')); updateStatus(); }
 
 function calloutLabels(){ const root=activeRoot(); if(!root)return []; const out=[root.label]; let items=root.children;
   for(const id of state.selection){ const it=items.find(x=>x.id===id); if(!it)break; out.push(it.label); items=it.children||[]; } return out; }
 function setApplied(){ state.applied=calloutLabels().join(' \u2192 '); }
 function updateStatus(){
+  if(state.hoverDesc){                       // Hover schlaegt den Ruhezustand
+    statusEl.innerHTML='';
+    const s=document.createElement('span'); s.className='desc'; s.textContent=state.hoverDesc;
+    statusEl.appendChild(s); return;
+  }
   statusEl.innerHTML = state.applied
     ? '<span class="ok">\u2713 '+state.applied+'</span>'
     : '<span class="muted">Bereit</span>';
@@ -1177,6 +1231,20 @@ stage.addEventListener('click',function(ev){
 },true);
 stage.addEventListener('click',function(){ if(state.playing)return; if(isOpen()) closeMenu(); if(CMP.copen) CMP.closeClassic(true); });
 document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!state.playing){ closeMenu(); CMP.closeClassic(true); } });
+
+/* Das Faecher-Layout haengt an der Groesse der Stage und wurde bisher nur bei
+   Interaktion gerechnet — nach einer Fenstergroessenaenderung ragten Bubbles aus
+   dem Bild. Die klassischen Panels sind absolut positioniert und werden dabei
+   geschlossen, wie es native Menues bei Fensteraenderungen ebenfalls tun. */
+let resizeRaf=0;
+window.addEventListener('resize',function(){
+  if(state.playing || resizeRaf) return;
+  resizeRaf=requestAnimationFrame(function(){
+    resizeRaf=0;
+    if(CMP.copen) CMP.closeClassic(true);
+    if(isOpen()) render();
+  });
+});
 
 updateStatus();
 })();
