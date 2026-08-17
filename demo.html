@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peacock Menus · Interaktiver Klickdummy</title>
+<style>
+:root{
+  --font:"Segoe UI",-apple-system,Roboto,"Liberation Sans",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --ink:#26272b; --ink-soft:#5a5f66; --line:#d3d3d3; --line-2:#c4c4c4;
+  --xl:#18A303; --xl-deep:#0E7A00;
+  --hov:#d8e9fa; --hov-line:#7fb2e0; --sel:#0078d7; --sel-deep:#005a9e;
+  --chrome:#f3f3f3; --grid:#e2e4e6; --hdr:#eceef0;
+  --cls:#d0342c; --pk:#18A303;
+}
+*{box-sizing:border-box} html,body{height:100%;margin:0;overflow:hidden}
+body{font-family:var(--font);color:var(--ink);background:#fff;font-size:13px}
+
+#stage{position:relative;width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;background:#fff}
+
+/* ---------- Anwendungsrahmen (LibreOffice-Calc-Nachbau) ---------- */
+.titlebar{display:flex;align-items:center;gap:8px;padding:5px 10px;background:#e8eaec;
+  border-bottom:1px solid var(--line);font-size:12px;color:var(--ink-soft);flex:none}
+.titlebar .dot{width:9px;height:9px;border-radius:50%;background:#c8ccd0}
+.titlebar b{color:var(--ink);font-weight:600}
+
+.menubar{position:relative;z-index:20;display:flex;flex:none;
+  background:var(--chrome);border-bottom:1px solid var(--line);padding:0 4px}
+.menubar .tab{padding:5px 10px;font:400 13px var(--font);cursor:pointer;user-select:none;
+  border-radius:3px;margin:2px 1px;white-space:nowrap}
+.menubar .tab:hover{background:#e6e8ea}
+.menubar .tab.open{background:#d4e8cf;color:var(--xl-deep)}
+
+.toolbar{display:flex;align-items:center;gap:3px;padding:4px 8px;background:#f7f8f8;
+  border-bottom:1px solid var(--line);flex:none}
+.toolbar i{display:block;width:22px;height:20px;border-radius:3px;background:#e4e7e9}
+.toolbar i.w{width:34px}
+.toolbar .sep{width:1px;height:16px;background:var(--line);margin:0 4px}
+
+.fbar{display:flex;align-items:stretch;gap:0;border-bottom:1px solid var(--line);flex:none;background:#fff}
+.fbar .cell{width:74px;border-right:1px solid var(--line);padding:3px 7px;font:12px var(--mono);color:var(--ink-soft)}
+.fbar .fx{flex:1;padding:3px 8px;font:12px var(--mono);color:var(--ink-soft)}
+
+#sheetWrap{position:relative;flex:1;min-height:0;overflow:hidden;background:#fff}
+table.sheet{border-collapse:collapse;table-layout:fixed;width:100%;font-size:12px}
+table.sheet th,table.sheet td{border:1px solid var(--grid);height:21px;padding:0 5px;
+  overflow:hidden;white-space:nowrap;text-align:left}
+table.sheet th{background:var(--hdr);color:var(--ink-soft);font-weight:600;text-align:center}
+table.sheet th.rw{width:34px}
+table.sheet td.num{text-align:right;font-family:var(--mono)}
+table.sheet td.b{font-weight:600}
+table.sheet td.sel{outline:2px solid var(--sel);outline-offset:-2px}
+.sheettabs{display:flex;gap:2px;align-items:center;padding:4px 8px;background:#f7f8f8;
+  border-top:1px solid var(--line);flex:none;font-size:12px;color:var(--ink-soft)}
+.sheettabs .st{padding:2px 10px;border:1px solid var(--line);border-bottom:0;border-radius:3px 3px 0 0;background:#eceef0}
+.sheettabs .st.on{background:#fff;color:var(--ink);font-weight:600}
+
+/* ---------- Bedienleiste der Demo ---------- */
+.ctl{position:absolute;right:12px;top:8px;z-index:60;display:flex;align-items:center;gap:8px}
+.seg{display:flex;border:1px solid var(--line-2);border-radius:6px;overflow:hidden;background:#fff}
+.seg button{border:0;background:#fff;padding:6px 13px;font:600 12px var(--font);cursor:pointer;color:var(--ink-soft)}
+.seg button+button{border-left:1px solid var(--line-2)}
+.seg button.on{color:#fff}
+.seg button[data-mode="classic"].on{background:var(--cls)}
+.seg button[data-mode="peacock"].on{background:var(--pk)}
+.btn{border:1px solid var(--line-2);background:#fff;border-radius:6px;padding:6px 13px;
+  font:600 12px var(--font);cursor:pointer;color:var(--ink)}
+.btn:hover{background:#f2f4f5}
+.btn.play{background:var(--cls);border-color:var(--cls);color:#fff;font-weight:700;
+  font-size:13px;padding:8px 20px;border-radius:7px;
+  box-shadow:0 2px 8px rgba(208,52,44,.4);
+  animation:playPulse 1.8s ease-in-out infinite}
+.btn.play:hover{background:#b3261e;border-color:#b3261e;animation:none;
+  box-shadow:0 2px 8px rgba(208,52,44,.4),0 0 0 5px rgba(208,52,44,.16)}
+.btn.play.running{animation:none;background:#8f221c;border-color:#8f221c}
+@keyframes playPulse{
+  0%,100%{box-shadow:0 2px 8px rgba(208,52,44,.4)}
+  50%{box-shadow:0 2px 8px rgba(208,52,44,.4),0 0 0 7px rgba(208,52,44,.18)}
+}
+.btn:disabled{opacity:.5;cursor:default}
+
+/* ---------- Messpanel ---------- */
+.hud{position:absolute;right:12px;bottom:12px;z-index:60;width:236px;background:rgba(255,255,255,.96);
+  border:1px solid var(--line-2);border-radius:8px;box-shadow:0 6px 18px rgba(20,40,20,.13);
+  padding:9px 11px 10px;font-size:12px}
+.hud h4{margin:0 0 7px;font:700 10px var(--font);letter-spacing:.07em;text-transform:uppercase;color:#7a828c}
+.hud table{width:100%;border-collapse:collapse}
+.hud td{padding:2px 0;vertical-align:baseline}
+.hud td.k{color:var(--ink-soft)}
+.hud td.v{text-align:right;font:600 12px var(--mono)}
+.hud .sw{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+.hud .sw.c{background:var(--cls)} .hud .sw.p{background:var(--pk)}
+.hud .res{margin-top:7px;padding-top:7px;border-top:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:baseline}
+.hud .res b{font:700 15px var(--mono);color:var(--xl-deep)}
+.hud.bare{width:210px}
+body.bare .ctl{top:auto;bottom:40px;left:12px;right:auto}
+.hud .note{margin-top:6px;color:#8a9099;line-height:1.35;font-size:11px}
+
+/* ---------- Peacock: Arme + Konvergenzpunkt ---------- */
+#armsSvg,#cdotSvg,#trailSvg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+#armsSvg{z-index:30} #cdotSvg{z-index:32} #trailSvg{z-index:44}
+g.callout{cursor:pointer;pointer-events:auto;filter:drop-shadow(0 2px 4px rgba(0,0,0,.16))}
+g.callout .co-body{fill:#fff;stroke:#c7cdc9;stroke-width:2;paint-order:stroke fill}
+g.callout .co-label{fill:var(--ink);font:400 12px var(--font);pointer-events:none}
+g.callout .co-chevron{fill:#445;font-size:9px;font-weight:700;pointer-events:none}
+g.callout:hover .co-body{fill:var(--hov);stroke:var(--hov-line)}
+g.callout.on .co-body{fill:var(--sel);stroke:var(--sel-deep)}
+g.callout.on .co-label,g.callout.on .co-chevron{fill:#fff}
+g.callout.past .co-body{fill:#f4f6f7;stroke:#dfe3e5}
+g.callout.past .co-label{fill:#98a0a8}
+#cdotSvg .c-dot{fill:var(--sel);fill-opacity:.92;stroke:#fff;stroke-width:1.4;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,.3));pointer-events:auto;cursor:pointer;
+  transform-box:fill-box;transform-origin:center;
+  transition:fill-opacity .12s,transform .12s,fill .12s,stroke .12s}
+#cdotSvg .c-dot:hover{fill-opacity:1;stroke-width:2;transform:scale(1.35)}
+/* Punkt einer bereits durchlaufenen Ebene: blauer Ring in voller Groesse -
+   liest sich als Station, zu der man zurueckspringen kann */
+#cdotSvg .c-dot.past{fill:#fff;fill-opacity:1;stroke:var(--sel);stroke-width:2}
+#cdotSvg .c-dot.past:hover{fill:var(--sel);stroke:#fff;transform:scale(1.35)}
+#cdotSvg .c-hit{fill:transparent;pointer-events:auto;cursor:pointer}
+#cdotSvg .c-hit:hover + .c-dot{transform:scale(1.35)}
+
+/* ---------- Klassisch: Dropdown-Kaskade ---------- */
+.dd{position:absolute;z-index:30;background:#fff;border:1px solid var(--line-2);
+  border-radius:3px;box-shadow:0 6px 18px rgba(0,0,0,.18);padding:3px 0;min-width:186px}
+.dd .it{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:5px 12px;cursor:pointer;white-space:nowrap;font-size:13px}
+.dd .it:hover{background:var(--hov)}
+.dd .it.on{background:var(--sel);color:#fff}
+.dd .it .ch{font-size:9px;font-weight:700;opacity:.65}
+.dd .it.dis{color:#a9afb5;cursor:default}
+.dd .sep{height:1px;background:var(--line);margin:3px 0}
+
+/* ---------- Mausweg-Aufzeichnung ---------- */
+#trailSvg .tr{fill:none;stroke:var(--cls);stroke-width:2;stroke-linejoin:round;stroke-dasharray:5 4}
+#trailSvg.pk .tr{stroke:var(--pk)}
+#trailSvg .wp{fill:#fff;stroke:var(--cls);stroke-width:2}
+#trailSvg.pk .wp{stroke:var(--pk)}
+#trailSvg .wl{fill:var(--cls);font:700 9px var(--font);text-anchor:middle;dominant-baseline:central}
+#trailSvg.pk .wl{fill:var(--pk)}
+#cursor{position:absolute;z-index:50;width:20px;height:26px;pointer-events:none;
+  transform:translate(-2px,-2px);opacity:0;transition:opacity .2s}
+#cursor.on{opacity:1}
+.hint{position:absolute;left:12px;bottom:38px;z-index:60;font-size:11.5px;color:#8a9099;
+  background:rgba(255,255,255,.9);border-radius:5px;padding:4px 8px}
+.menubar{overflow:hidden}
+@media (max-width:820px){
+  .menubar .tab{padding:5px 6px;font-size:12px}
+  .titlebar{font-size:11px}
+}
+@media (max-width:760px){
+  .hud{width:200px;right:8px;bottom:8px}
+  .ctl{right:8px;top:6px;gap:5px}
+  .seg button,.btn{padding:5px 9px;font-size:11.5px}
+  .hint{display:none}
+}
+</style></head><body>
+
+<div id="stage">
+  <div class="titlebar"><span class="dot"></span><b>Quartalsbericht.ods</b> — Peacock Menus · Klickdummy zur Verfahrensdemonstration</div>
+  <div class="menubar" id="tabbar"></div>
+  <div class="toolbar">
+    <i class="w"></i><i></i><i></i><span class="sep"></span><i></i><i></i><i></i>
+    <span class="sep"></span><i class="w"></i><i></i><i></i><span class="sep"></span><i></i><i></i><i></i><i></i>
+  </div>
+  <div class="fbar"><div class="cell">C7</div><div class="fx">= SUMME(C3:C6)</div></div>
+  <div id="sheetWrap"></div>
+  <div class="sheettabs"><span class="st on">Q1</span><span class="st">Q2</span><span class="st">Jahr</span></div>
+
+  <svg id="armsSvg"></svg>
+  <svg id="cdotSvg"></svg>
+  <svg id="trailSvg"></svg>
+  <svg id="cursor" viewBox="0 0 20 26"><path d="M2 1 L2 20 L7 15.5 L10.5 24 L13.5 22.7 L10 14.5 L16.5 14.5 Z"
+    fill="#fff" stroke="#c0392b" stroke-width="1.6" stroke-linejoin="round"/></svg>
+
+  <div class="ctl">
+    <div class="seg" id="seg">
+      <button data-mode="classic">Klassisch</button>
+      <button data-mode="peacock" class="on">Peacock</button>
+    </div>
+    <button class="btn play" id="btnPlay">&#9654; Play</button>
+    <button class="btn" id="btnReset">Zurücksetzen</button>
+  </div>
+
+  <div class="hud" id="hud">
+    <h4>Mausweg je Vorgang</h4>
+    <table>
+      <tr id="rowCls"><td class="k"><span class="sw c"></span>Klassisch</td><td class="v" id="hCls">–</td></tr>
+      <tr id="rowPk"><td class="k"><span class="sw p"></span>Peacock</td><td class="v" id="hPk">–</td></tr>
+    </table>
+    <div class="res"><span class="k">Ersparnis</span><b id="hSave">–</b></div>
+    <div class="note" id="hNote">Vorgang: Einfügen → Diagramm → Säule → Gestapelt. Mit &#9654; Play in beiden Ansichten messen.</div>
+  </div>
+  <div class="hint" id="hint">Menüpunkt klicken · Rechtsklick im Blatt öffnet das Kontextmenü · in „Peacock“ genügt ein Klick auf den Armanfang</div>
+</div>
+
+<script>
+(function(){
+'use strict';
+const NS='http://www.w3.org/2000/svg';
+const $=s=>document.querySelector(s);
+const stage=$('#stage'), tabbar=$('#tabbar'), armsSvg=$('#armsSvg'), cdotSvg=$('#cdotSvg'),
+      trailSvg=$('#trailSvg'), cursor=$('#cursor'), sheetWrap=$('#sheetWrap');
+
+/* ============================ Menuebaum ============================ */
+const TREE={
+  datei:{label:'Datei',children:[
+    {id:'neu',label:'Neu'},{id:'oef',label:'Öffnen'},{id:'spe',label:'Speichern'},
+    {id:'exp',label:'Exportieren als',children:[{id:'pdf',label:'PDF'},{id:'csv',label:'CSV'},{id:'xls',label:'Excel'}]},
+    {id:'dru',label:'Drucken'}]},
+  bearb:{label:'Bearbeiten',children:[
+    {id:'rue',label:'Rückgängig'},{id:'wdh',label:'Wiederholen'},{id:'aus',label:'Ausschneiden'},
+    {id:'kop',label:'Kopieren'},{id:'ein',label:'Einfügen'},{id:'suc',label:'Suchen & Ersetzen'}]},
+  ansicht:{label:'Ansicht',children:[
+    {id:'nor',label:'Normal'},{id:'sei',label:'Seitenumbruch'},{id:'sym',label:'Symbolleisten',
+      children:[{id:'std',label:'Standard'},{id:'for',label:'Formatierung'},{id:'zei',label:'Zeichnung'}]},
+    {id:'ras',label:'Rasterlinien'},{id:'vol',label:'Vollbild'}]},
+  einf:{label:'Einfügen',children:[
+    {id:'zei',label:'Zeilen'},{id:'spa',label:'Spalten'},
+    {id:'dia',label:'Diagramm',children:[
+      {id:'sae',label:'Säule',children:[{id:'nor',label:'Normal'},{id:'ges',label:'Gestapelt'},{id:'pro',label:'Prozentual'}]},
+      {id:'bal',label:'Balken'},{id:'kre',label:'Kreis'},{id:'lin',label:'Linie'},{id:'flae',label:'Fläche'},{id:'net',label:'Netz'}]},
+    {id:'bil',label:'Bild'},{id:'fun',label:'Funktion'},
+    {id:'kom',label:'Kommentar'},{id:'son',label:'Sonderzeichen'},{id:'kfz',label:'Kopf-/Fußzeile'}]},
+  format:{label:'Format',children:[
+    {id:'zel',label:'Zellen'},{id:'zeh',label:'Zeilen'},{id:'spb',label:'Spalten'},
+    {id:'bed',label:'Bedingtes Format',children:[{id:'far',label:'Farbskala'},{id:'dat',label:'Datenbalken'},{id:'sym',label:'Symbolsatz'}]},
+    {id:'svo',label:'Seitenvorlage'}]},
+  tabelle:{label:'Tabelle',children:[
+    {id:'tei',label:'Einfügen'},{id:'tlo',label:'Löschen'},{id:'tum',label:'Umbenennen'},{id:'tve',label:'Verschieben'}]},
+  daten:{label:'Daten',children:[
+    {id:'sor',label:'Sortieren'},{id:'aut',label:'AutoFilter'},{id:'sta',label:'Standardfilter'},
+    {id:'gue',label:'Gültigkeit'},{id:'piv',label:'Pivot-Tabelle',children:[{id:'pne',label:'Einfügen'},{id:'pak',label:'Aktualisieren'}]}]},
+  extras:{label:'Extras',children:[
+    {id:'rec',label:'Rechtschreibung'},{id:'mak',label:'Makros',children:[{id:'mau',label:'Ausführen'},{id:'mbe',label:'Bearbeiten'}]},
+    {id:'opt',label:'Optionen'}]},
+  fenster:{label:'Fenster',children:[
+    {id:'fne',label:'Neues Fenster'},{id:'fte',label:'Teilen'},{id:'ffi',label:'Fixieren'}]},
+  hilfe:{label:'Hilfe',children:[
+    {id:'hlo',label:'LibreOffice-Hilfe'},{id:'hwa',label:'Was ist das?'},{id:'hue',label:'Über'}]}
+};
+const ORDER=['datei','bearb','ansicht','einf','format','tabelle','daten','extras','fenster','hilfe'];
+
+/* Kontextmenü (rechte Maustaste im Tabellenblatt). Gleiche Gestaltung und
+   Bedienlogik wie das Hauptmenü, nur die Anordnung der ersten Ebene ist radial. */
+const CTX=[
+  {id:'cx',label:'Ausschneiden'},
+  {id:'cc',label:'Kopieren'},
+  {id:'cv',label:'Einfügen'},
+  {id:'cs',label:'Inhalte einfügen',children:[{id:'st',label:'Nur Text'},{id:'sw',label:'Nur Werte'},{id:'sf',label:'Nur Formate'}]},
+  {id:'cf',label:'Zellen formatieren',children:[{id:'fz',label:'Zahlen'},{id:'fa',label:'Ausrichtung'},{id:'fr',label:'Umrandung'}]},
+  {id:'cz',label:'Zeile einfügen'},
+  {id:'cp',label:'Spalte einfügen'},
+  {id:'ck',label:'Kommentar'}
+];
+
+/* Blaettern: mehr als PAGE Einträge werden seitenweise gezeigt (Peacock-Ansicht) */
+const PAGE=6, MORE='(Weitere Einträge)';
+
+const Q=new URLSearchParams((location.search||'').replace(/^\?/,'')+'&'+(location.hash||'').replace(/^#/,''));
+let MODE=(Q.get('mode')==='classic')?'classic':'peacock';
+const LOCK=Q.get('lock')==='1';          /* Ansichtsumschalter ausblenden */
+const BARE=Q.get('bare')==='1';          /* schlanke Fassung fuer die Vergleichskarten */
+const state={openTab:null, selection:[], clickC:[], page:[], ctx:null};
+
+/* ============================ Tabellenblatt ============================ */
+(function sheet(){
+  const cols=['A','B','C','D','E','F','G','H','I','J','K','L','M','N'];
+  const data={
+    'A2':['Region','b'],'B2':['Q1','b'],'C2':['Q2','b'],'D2':['Q3','b'],'E2':['Q4','b'],'F2':['Summe','b'],
+    'A3':['Nord'],'B3':['12.400','num'],'C3':['13.910','num'],'D3':['14.220','num'],'E3':['15.870','num'],'F3':['56.400','num'],
+    'A4':['Süd'],'B4':['9.870','num'],'C4':['10.240','num'],'D4':['11.005','num'],'E4':['12.310','num'],'F4':['43.425','num'],
+    'A5':['West'],'B5':['7.320','num'],'C5':['7.880','num'],'D5':['8.140','num'],'E5':['8.905','num'],'F5':['32.245','num'],
+    'A6':['Ost'],'B6':['5.640','num'],'C6':['6.120','num'],'D6':['6.470','num'],'E6':['7.010','num'],'F6':['25.240','num'],
+    'A7':['Gesamt','b'],'B7':['35.230','num b'],'C7':['38.150','num b'],'D7':['39.835','num b'],'E7':['44.095','num b'],'F7':['157.310','num b']
+  };
+  let h='<table class="sheet"><tr><th class="rw"></th>'+cols.map(c=>'<th>'+c+'</th>').join('')+'</tr>';
+  for(let r=1;r<=22;r++){
+    h+='<tr><th class="rw">'+r+'</th>';
+    cols.forEach(c=>{const d=data[c+r];
+      h+='<td class="'+((d&&d[1])||'')+(c+r==='C7'?' sel':'')+'">'+((d&&d[0])||'')+'</td>';});
+    h+='</tr>';
+  }
+  sheetWrap.innerHTML=h+'</table>';
+})();
+
+/* ============================ Reiter ============================ */
+ORDER.forEach(id=>{
+  const t=document.createElement('div');t.className='tab';t.dataset.tab=id;t.textContent=TREE[id].label;
+  t.addEventListener('click',ev=>{ev.stopPropagation();onTabClick(id);});
+  tabbar.appendChild(t);
+});
+function stageRect(){return stage.getBoundingClientRect();}
+function toStage(ev){const s=stageRect();return {x:ev.clientX-s.left,y:ev.clientY-s.top};}
+function tabEl(id){return tabbar.querySelector('.tab[data-tab="'+id+'"]');}
+function tabAnchor(id){const r=tabEl(id).getBoundingClientRect(),s=stageRect();
+  return {x:r.left-s.left+r.width/2, y:r.bottom-s.top+2};}
+function n(v){return v.toFixed(1);}
+
+/* ============================ Textmessung ============================ */
+const measureG=document.createElementNS(NS,'g');measureG.setAttribute('class','callout');
+measureG.setAttribute('visibility','hidden');armsSvg.appendChild(measureG);
+const measureText=document.createElementNS(NS,'text');measureText.setAttribute('class','co-label');
+measureText.setAttribute('x','-9999');measureText.setAttribute('y','-9999');measureG.appendChild(measureText);
+const wcache={};
+function labelWidth(s){if(wcache[s]!=null)return wcache[s];measureText.textContent=s;
+  const w=measureText.getBBox().width;wcache[s]=w;return w;}
+let BUBBLE_H=null;let PAD_X=15,PAD_Y=6;const CHEV_W=16;
+function bubbleH(){if(BUBBLE_H==null){measureText.textContent='Ag';BUBBLE_H=measureText.getBBox().height+PAD_Y*2;}return BUBBLE_H;}
+/* EINE Blasenbreite fuer das ganze Menue: sonst faellt z. B. „Format" wegen
+   „Bedingte Formatierung" breiter aus als die uebrigen Menuepunkte. */
+let GLOBAL_W=null;
+function levelWidth(){
+  if(GLOBAL_W==null){
+    let m=labelWidth(MORE)+PAD_X*2;
+    const walk=a=>a.forEach(it=>{
+      m=Math.max(m, labelWidth(it.label)+PAD_X*2+(it.children?CHEV_W:0));
+      if(it.children) walk(it.children);});
+    ORDER.forEach(k=>walk(TREE[k].children));
+    GLOBAL_W=Math.round(m);
+  }
+  return GLOBAL_W;
+}
+
+/* ==================== GEOMETRIE (Werte: Vorgabe Word-Datei) ==================== */
+const BASE={ARM_W:10,TIP_W:2,DOT_R:6,DROP:10,ROW_GAP:2,OFF_0:25,OFF_STEP:11,OFF_MIN:0,PAD_X:15,PAD_Y:6};
+/* Einseitige Faecher (Menuepunkte am Bildrand) brauchen eine Zeile je Eintrag.
+   Versatz und Stufe werden dort so gesetzt, dass die Treppe bis an C auslaeuft. */
+const EDGE_STEP=14;
+let ARM_W,TIP_W,DOT_R,DROP,ROW_GAP,OFF_0,OFF_STEP,OFF_MIN;
+const MARGIN=12;
+function loadCfg(){
+  ARM_W=BASE.ARM_W;TIP_W=BASE.TIP_W;DOT_R=BASE.DOT_R;DROP=BASE.DROP;ROW_GAP=BASE.ROW_GAP;
+  OFF_0=BASE.OFF_0;OFF_STEP=BASE.OFF_STEP;OFF_MIN=BASE.OFF_MIN;
+  if(PAD_X!==BASE.PAD_X){PAD_X=BASE.PAD_X;}
+  if(PAD_Y!==BASE.PAD_Y){PAD_Y=BASE.PAD_Y;BUBBLE_H=null;}
+}
+let LAST_ANCHOR=null;
+
+/* Arm = Trapez mit konstanter Breite senkrecht zur Achse: TIP_W in C, ARM_W am Ansatz.
+   Basis liegt vollstaendig auf einer Blasenkante und beginnt an der C zugewandten Ecke;
+   gewaehlt wird die Kante mit der kuerzeren Basis. Blase und Arm sind zwei Teilpfade
+   eines Pfades, vereinigt ueber die nonzero-Fuellregel; die Naht verschwindet durch
+   paint-order:stroke fill. Gleiche Form und Breite auf jeder Ebene, kein Ueberstand. */
+function calloutPath(cx,cy,w,h,C){
+  const L=cx-w/2,R=cx+w/2,T=cy-h/2,B=cy+h/2;
+  const dxc=C.x-cx, dyc=C.y-cy;
+  const eY=(dyc>=0)?B:T, eX=(dxc>=0)?R:L;
+  const inX=Math.abs(dxc)<w/2, inY=Math.abs(dyc)<h/2;
+  const P0={x:inX?Math.max(L+4,Math.min(R-4,C.x)):eX, y:inY?Math.max(T+4,Math.min(B-4,C.y)):eY};
+  const lenTo=p=>Math.hypot(p.x-C.x,p.y-C.y)||1;
+  const lc0=lenTo(P0);
+  const horiz = inX || (!inY && (lc0/Math.max(0.5,Math.abs(P0.y-C.y))) <= (lc0/Math.max(0.5,Math.abs(P0.x-C.x))));
+  let a1,a2,Pm=P0;
+  for(let it=0; it<3; it++){
+    const l=lenTo(Pm);
+    const comp=horiz ? Math.abs(Pm.y-C.y)/l : Math.abs(Pm.x-C.x)/l;
+    const b=Math.min(ARM_W/Math.max(0.15,comp), (horiz?w:h)-1);
+    if(horiz){
+      if(inX){ const x=Math.max(L+b/2,Math.min(R-b/2,C.x)); a1={x:x-b/2,y:eY}; a2={x:x+b/2,y:eY}; }
+      else   { const o=(dxc>=0)?-1:1; a1={x:eX,y:eY}; a2={x:eX+o*b,y:eY}; }
+    } else {
+      if(inY){ const y=Math.max(T+b/2,Math.min(B-b/2,C.y)); a1={x:eX,y:y-b/2}; a2={x:eX,y:y+b/2}; }
+      else   { const o=(dyc>=0)?-1:1; a1={x:eX,y:eY}; a2={x:eX,y:eY+o*b}; }
+    }
+    Pm={x:(a1.x+a2.x)/2,y:(a1.y+a2.y)/2};
+  }
+  LAST_ANCHOR={x:Pm.x,y:Pm.y};
+  const ln=Math.hypot(Pm.x-C.x,Pm.y-C.y)||1;
+  const nx=-(Pm.y-C.y)/ln, ny=(Pm.x-C.x)/ln, t=TIP_W/2;
+  const sg=Math.sign((a1.x-C.x)*nx+(a1.y-C.y)*ny)||1;
+  let q=[{x:C.x+nx*sg*t,y:C.y+ny*sg*t}, a1, a2, {x:C.x-nx*sg*t,y:C.y-ny*sg*t}];
+  let sh=0; for(let i=0;i<4;i++){const p1=q[i],p2=q[(i+1)%4]; sh+=p1.x*p2.y-p2.x*p1.y;}
+  if(sh<0) q.reverse();
+  const rect='M '+n(L)+' '+n(T)+' L '+n(R)+' '+n(T)+' L '+n(R)+' '+n(B)+' L '+n(L)+' '+n(B)+' Z';
+  const arm ='M '+q.map(p=>n(p.x)+' '+n(p.y)).join(' L ')+' Z';
+  return rect+' '+arm;
+}
+
+/* Doppelkaskade mit konstantem Zeilenraster und konstanten Versaetzen.
+   Ungerade Anzahl: der uebrige Eintrag steht mittig unter C. */
+function layoutLevel(C, items, bounds){
+  const N=items.length, H=bubbleH(), W=levelWidth(items);
+  const rowH=H+ROW_GAP, yMin=(bounds.yMin!=null?bounds.yMin:0);
+  const roomL=C.x-MARGIN, roomR=bounds.w-C.x-MARGIN;
+  const needSide=W+OFF_0;   /* die oberste Zeile braucht den vollen Versatz OFF_0 */
+  /* Eine Ebene darf waagerecht um bis zu SHIFT_X_MAX verschoben werden, um die
+     zweiseitige Anordnung zu halten. Der Konvergenzpunkt bleibt dabei unveraendert,
+     die Verschiebung faellt optisch nicht auf - sonst kippte eine Ebene schon wegen
+     weniger Pixel in die einseitige Kaskade (z. B. Ansicht > Symbolleisten). */
+  const SHIFT_X_MAX=26;
+  const twoSided=(roomL+SHIFT_X_MAX>=needSide && roomR+SHIFT_X_MAX>=needSide);
+  const centreFits=(roomL>=W/2+MARGIN && roomR>=W/2+MARGIN);
+
+  let kL,kR,centre=null,rows;
+  if(twoSided){
+    if(N%2===1 && centreFits){ centre=items[N-1]; const rest=N-1; kL=rest/2; kR=rest/2; rows=kL+1; }
+    else { kL=Math.ceil(N/2); kR=N-kL; rows=Math.max(kL,kR); }
+  } else if(roomR>=roomL){ kL=0; kR=N; rows=N; }
+  else { kL=N; kR=0; rows=N; }
+
+  /* einseitig: Stufe und Startversatz so, dass die Treppe auf OFF_MIN auslaeuft */
+  let off0=OFF_0, step=OFF_STEP;
+  if(!twoSided && rows>1){ step=EDGE_STEP; off0=OFF_MIN+(rows-1)*EDGE_STEP; }
+
+  const needH=DROP+rows*rowH;
+  const roomDown=bounds.h-MARGIN-C.y, roomUp=C.y-yMin-MARGIN;
+  const vdir=(roomDown>=needH)?+1:((roomUp>=needH)?-1:(roomDown>=roomUp?+1:-1));
+
+  const offMax=Math.max(OFF_MIN,(twoSided?Math.min(roomL,roomR)+SHIFT_X_MAX:Math.max(roomL,roomR))-W);
+  const offFor=r=>Math.min(offMax, Math.max(OFF_MIN, off0-r*step));
+
+  const out=[];
+  const place=(arr,side)=>arr.forEach((it,r)=>{
+    const dy=DROP+H/2+r*rowH, off=offFor(r);
+    out.push({item:it,w:W,h:H,cx:C.x+side*(off+W/2),cy:C.y+vdir*dy});
+  });
+  place(items.slice(0,kL),-1);
+  place(items.slice(kL,kL+kR),+1);
+  if(centre){
+    const dy=DROP+H/2+(rows-1)*rowH;
+    out.push({item:centre,w:W,h:H,cx:C.x,cy:C.y+vdir*dy});
+  }
+  /* waagerechte Randkorrektur: ganze Ebene minimal einruecken */
+  const ovL=Math.max(0,...out.map(p=>MARGIN+p.w/2-p.cx));
+  const ovR=Math.max(0,...out.map(p=>p.cx+p.w/2-(bounds.w-MARGIN)));
+  let sx=(ovL>0)?ovL:-ovR;
+  sx=Math.max(-SHIFT_X_MAX,Math.min(SHIFT_X_MAX,sx));
+  if(sx) out.forEach(p=>{p.cx+=sx;});
+
+  const shiftDown=Math.max(0,...out.map(p=>yMin+p.h/2-p.cy));
+  const shiftUp  =Math.max(0,...out.map(p=>p.cy+p.h/2-(bounds.h-MARGIN)));
+  let shift=(shiftDown>0)?shiftDown:-shiftUp;
+  const shiftMax=Math.max(0,DROP-4);
+  shift=(vdir>0)?Math.max(shift,-shiftMax):Math.min(shift,shiftMax);
+  if(shift) out.forEach(p=>{p.cy+=shift;});
+  return out;
+}
+
+/* Radiale Anordnung der ersten Kontextmenü-Ebene - dreistufig:
+   1) Liegt der Auslösepunkt frei in der Arbeitsfläche, öffnet das Menü über volle 360°.
+   2) Fehlt der Platz nur zu EINER Seite (linker/rechter Rand), öffnet ein
+      halbkreisförmiger Fächer über 180° in den freien Halbraum: die Einträge
+      verteilen sich mit gleichmäßigem Zeilenabstand nach oben UND unten auf einer
+      Halbellipse um C. So wird die verfügbare Fläche am Rand voll genutzt.
+   3) Erst wenn auch dafür der Platz fehlt (Ecken, sehr schmale Fläche), gibt die
+      Funktion null zurück und die Treppenanordnung des Hauptmenüs greift.
+   Blasenmaße, Armbreite und Konvergenzpunkt sind in allen Fällen identisch. */
+function layoutRadial(C, items, bounds){
+  const n=items.length, H=bubbleH(), W=levelWidth();
+  const RX=OFF_0+W/2, RY=OFF_0+H/2+14;          /* Ellipse: waagerecht weiter als senkrecht */
+  const yMin=bounds.yMin||0;
+  const okL = C.x-(RX+W/2) >= MARGIN;
+  const okR = C.x+(RX+W/2) <= bounds.w-MARGIN;
+  const okU = C.y-(RY+H/2) >= yMin+MARGIN;
+  const okD = C.y+(RY+H/2) <= bounds.h-MARGIN;
+
+  /* Stufe 1: Vollkreis */
+  if(okL&&okR&&okU&&okD){
+    const step=360/n, out=[];
+    for(let k=0;k<n;k++){
+      const t=(-90+k*step)*Math.PI/180;         /* im Uhrzeigersinn ab oben, symmetrisch zur Senkrechten */
+      out.push({item:items[k],w:W,h:H,cx:C.x+RX*Math.cos(t),cy:C.y+RY*Math.sin(t)});
+    }
+    return out;
+  }
+
+  /* Stufe 2: 180°-Fächer am linken oder rechten Rand.
+     axis=+1: Öffnung nach rechts, axis=-1: Öffnung nach links. */
+  if(okL!==okR){
+    const axis=okR?+1:-1;
+    const sV=H+4;                               /* gleichmäßiger Zeilenabstand */
+    const span=(n-1)*sV;                        /* Höhe des Fächers (Mitte zu Mitte) */
+    const RY2=span/2+10, RX2=RX*1.35;           /* Halbellipse: hoch und leicht ausladend */
+    const fitV = (C.y-(span/2+H/2) >= yMin+MARGIN) && (C.y+span/2+H/2 <= bounds.h-MARGIN);
+    const fitF = (axis>0) ? (C.x+RX2+W/2 <= bounds.w-MARGIN) : (C.x-RX2-W/2 >= MARGIN);
+    /* Überhang der äußersten Blasen zur Randseite hin */
+    const xoffMin=RX2*Math.sqrt(Math.max(0,1-Math.pow((span/2)/RY2,2)));
+    const over=Math.max(0,W/2-xoffMin);
+    const fitB = (axis>0) ? (C.x-over >= MARGIN) : (C.x+over <= bounds.w-MARGIN);
+    if(fitV&&fitF&&fitB){
+      const out=[];
+      for(let k=0;k<n;k++){
+        const dy=-span/2+k*sV;
+        const xo=RX2*Math.sqrt(Math.max(0,1-(dy*dy)/(RY2*RY2)));
+        out.push({item:items[k],w:W,h:H,cx:C.x+axis*xo,cy:C.y+dy});
+      }
+      return out;
+    }
+  }
+
+  /* Stufe 3: Treppenanordnung (layoutLevel) */
+  return null;
+}
+
+/* Seitenweise Anzeige: PAGE-1 Eintraege plus Blaetter-Eintrag */
+function pageItems(items,depth){
+  if(items.length<=PAGE) return items;
+  const per=PAGE-1, pages=Math.ceil(items.length/per);
+  const pg=((state.page[depth]||0)%pages+pages)%pages;
+  const slice=items.slice(pg*per,pg*per+per);
+  return slice.concat([{id:'__more__',label:MORE,__more:true,__depth:depth,__pages:pages}]);
+}
+
+function buildLevels(bounds){
+  const ctx=!!state.ctx;
+  const root=ctx?{children:CTX}:TREE[state.openTab];
+  if(!root) return [];
+  let items=root.children, C=ctx?{x:state.ctx.x,y:state.ctx.y}:tabAnchor(state.openTab), depth=0;
+  const levels=[];
+  while(items){
+    const shown=pageItems(items,depth);
+    const selId=state.selection[depth]||null;
+    const placements=((ctx&&depth===0)?layoutRadial(C,shown,bounds):null) || layoutLevel(C,shown,bounds);
+    const selPlace=selId?placements.find(p=>p.item.id===selId):null;
+    levels.push({C,placements:(selPlace?[selPlace]:placements),selectedId:selId,depth});
+    if(!selId) break;
+    const selItem=selPlace?selPlace.item:null;
+    if(!selItem||!selItem.children) break;
+    C=state.clickC[depth]||{x:selPlace.cx,y:selPlace.cy};
+    items=selItem.children; depth++;
+  }
+  return levels;
+}
+
+/* ============================ Peacock zeichnen ============================ */
+function clearPeacock(){
+  [...armsSvg.querySelectorAll('g.callout:not([visibility])')].forEach(e=>e.remove());
+  cdotSvg.innerHTML='';
+}
+function renderPeacock(){
+  loadCfg(); clearPeacock();
+  if(!state.openTab && !state.ctx) return;
+  const s=stageRect(), tb=tabbar.getBoundingClientRect();
+  const bounds={w:s.width,h:s.height,yMin:tb.bottom-s.top+2};
+  const levels=buildLevels(bounds);
+
+  levels.forEach((lvl,li)=>{
+    const active=(li===levels.length-1);
+    /* unsichtbarer, groesserer Trefferbereich, damit auch kleine Vergangenheits-
+       Punkte gut klickbar sind */
+    const hit=document.createElementNS(NS,'circle');
+    hit.setAttribute('cx',n(lvl.C.x));hit.setAttribute('cy',n(lvl.C.y));
+    hit.setAttribute('r','16');hit.setAttribute('class','c-hit');
+    const c=document.createElementNS(NS,'circle');
+    c.setAttribute('cx',n(lvl.C.x));c.setAttribute('cy',n(lvl.C.y));
+    c.setAttribute('r',String(DOT_R));
+    c.setAttribute('class','c-dot'+(active?'':' past'));
+    const tip=document.createElementNS(NS,'title');
+    tip.textContent=active?(li===0?'Menü schließen':'Eine Ebene zurück'):'Zu dieser Ebene zurück';
+    c.appendChild(tip);
+    const back=ev=>{ev.stopPropagation();if(!PLAYING)backToLevel(li);};
+    hit.addEventListener('click',back);c.addEventListener('click',back);
+    cdotSvg.appendChild(hit);cdotSvg.appendChild(c);
+  });
+
+  levels.forEach((lvl,li)=>lvl.placements.forEach(p=>{
+    const last=(li===levels.length-1);
+    const g=document.createElementNS(NS,'g');
+    g.setAttribute('class','callout'+(!last?' past':''));
+    g.dataset.level=li;g.dataset.id=p.item.id;
+    const path=document.createElementNS(NS,'path');
+    path.setAttribute('d',calloutPath(p.cx,p.cy,p.w,p.h,lvl.C));
+    path.setAttribute('class','co-body');g.appendChild(path);
+    g.dataset.cx=n(lvl.C.x);g.dataset.cy=n(lvl.C.y);
+    g.dataset.ax=n(LAST_ANCHOR.x);g.dataset.ay=n(LAST_ANCHOR.y);
+    g.dataset.bx=n(p.cx-p.w/2);g.dataset.by=n(p.cy-p.h/2);
+    g.dataset.bw=n(p.w);g.dataset.bh=n(p.h);
+    const chev=!!p.item.children;
+    const t=document.createElementNS(NS,'text');
+    t.setAttribute('x',n(p.cx-(chev?CHEV_W:0)/2));t.setAttribute('y',n(p.cy));
+    t.setAttribute('text-anchor','middle');t.setAttribute('dominant-baseline','central');
+    t.setAttribute('class','co-label');t.textContent=p.item.label;g.appendChild(t);
+    if(chev){const ch=document.createElementNS(NS,'text');
+      ch.setAttribute('x',n(p.cx+p.w/2-PAD_X));ch.setAttribute('y',n(p.cy+1));
+      ch.setAttribute('text-anchor','middle');ch.setAttribute('dominant-baseline','central');
+      ch.setAttribute('class','co-chevron');ch.textContent='\u25B6';g.appendChild(ch);}
+    g.addEventListener('click',ev=>{ev.stopPropagation();choose(p.item,li,toStage(ev));});
+    armsSvg.appendChild(g);
+  }));
+}
+
+/* ============================ Klassisch zeichnen ============================ */
+function clearClassic(){ [...stage.querySelectorAll('.dd')].forEach(e=>e.remove()); }
+function renderClassic(){
+  clearClassic();
+  if(!state.openTab && !state.ctx) return;
+  const s=stageRect();
+  let items, anchor;
+  if(state.ctx){ items=CTX; anchor={x:state.ctx.x, y:state.ctx.y}; }
+  else { const tr=tabEl(state.openTab).getBoundingClientRect();
+         items=TREE[state.openTab].children; anchor={x:tr.left-s.left, y:tr.bottom-s.top+1}; }
+  let depth=0, prevBox=null;
+  while(items){
+    const dd=document.createElement('div');dd.className='dd';dd.dataset.level=depth;
+    items.forEach(it=>{
+      const row=document.createElement('div');
+      row.className='it'+(state.selection[depth]===it.id?' on':'');
+      row.innerHTML='<span>'+it.label+'</span>'+(it.children?'<span class="ch">\u25B6</span>':'');
+      const d=depth, item=it;
+      row.addEventListener('click',ev=>{ev.stopPropagation();choose(item,d,toStage(ev));});
+      dd.appendChild(row);
+    });
+    stage.appendChild(dd);
+    const w=dd.offsetWidth, h=dd.offsetHeight;
+    let x=anchor.x, y=anchor.y;
+    if(depth>0){ x=prevBox.x+prevBox.w-2; y=anchor.y-4; }
+    x=Math.max(4,Math.min(s.width-w-4,x));
+    y=Math.max(4,Math.min(s.height-h-4,y));
+    dd.style.left=x+'px'; dd.style.top=y+'px';
+    prevBox={x,y,w,h};
+
+    const selId=state.selection[depth];
+    if(!selId) break;
+    const idx=items.findIndex(i=>i.id===selId);
+    const sel=items[idx];
+    if(!sel||!sel.children) break;
+    const rowEl=dd.children[idx];
+    anchor={x:x+w-2, y:y+rowEl.offsetTop};
+    items=sel.children; depth++;
+  }
+}
+
+/* ============================ Auswahl / Zustand ============================ */
+/* Klick auf einen Konvergenzpunkt C: zurueck navigieren.
+   Punkt einer bereits durchlaufenen Ebene -> diese Ebene wieder voll oeffnen.
+   Punkt der aktiven (letzten) Ebene -> eine Ebene zurueck; auf Ebene 0 -> alles schliessen.
+   Funktioniert identisch fuer Tab-Menues und das Radial-Kontextmenue. */
+function backToLevel(li){
+  if(state.selection[li]!==undefined){
+    state.selection=state.selection.slice(0,li);
+    state.clickC=state.clickC.slice(0,li);
+    state.page=state.page.slice(0,li+1);
+  } else if(li===0){
+    closeAll(); return;
+  } else {
+    state.selection=state.selection.slice(0,li-1);
+    state.clickC=state.clickC.slice(0,li-1);
+    state.page=state.page.slice(0,li);
+  }
+  render();
+}
+function choose(item,depth,pt){
+  if(item.__more){ state.page[item.__depth]=(state.page[item.__depth]||0)+1; render(); return; }
+  state.selection=state.selection.slice(0,depth);
+  state.clickC=state.clickC.slice(0,depth);
+  state.page=state.page.slice(0,depth+1);
+  state.selection[depth]=item.id;
+  state.clickC[depth]=pt;
+  render();
+}
+function onTabClick(id){
+  if(state.openTab===id){ closeAll(); }
+  else { state.openTab=id; state.ctx=null; state.selection=[]; state.clickC=[]; state.page=[]; }
+  tabbar.querySelectorAll('.tab').forEach(t=>t.classList.toggle('open',t.dataset.tab===state.openTab));
+  render();
+}
+function closeAll(){
+  state.openTab=null;state.ctx=null;state.selection=[];state.clickC=[];state.page=[];
+  tabbar.querySelectorAll('.tab').forEach(t=>t.classList.remove('open'));
+  render();
+}
+function render(){ if(MODE==='peacock'){ clearClassic(); renderPeacock(); } else { clearPeacock(); renderClassic(); } }
+stage.addEventListener('click',()=>{ if(!PLAYING) closeAll(); });
+/* rechte Maustaste im Arbeitsbereich oeffnet das Kontextmenue am Zeiger */
+stage.addEventListener('contextmenu',ev=>{
+  if(PLAYING) return;
+  ev.preventDefault();
+  const pt=toStage(ev);
+  const tb=tabbar.getBoundingClientRect(), s=stageRect();
+  if(pt.y < tb.bottom-s.top) return;            /* nicht im Menueband */
+  state.openTab=null;state.selection=[];state.clickC=[];state.page=[];
+  tabbar.querySelectorAll('.tab').forEach(t=>t.classList.remove('open'));
+  state.ctx={x:pt.x,y:pt.y};
+  render();
+});
+window.addEventListener('resize',()=>{ if(!PLAYING) render(); });
+
+/* ============================ Ansicht umschalten ============================ */
+$('#seg').addEventListener('click',ev=>{
+  const b=ev.target.closest('button[data-mode]'); if(!b||PLAYING||LOCK) return;
+  MODE=b.dataset.mode;
+  $('#seg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+  trailSvg.classList.toggle('pk',MODE==='peacock');
+  clearTrail(); closeAll();
+  $('#hint').textContent = MODE==='peacock'
+    ? 'Menüpunkt klicken · Rechtsklick im Blatt öffnet das Kontextmenü · in „Peacock“ genügt ein Klick auf den Armanfang'
+    : 'Menüpunkt oder Rechtsklick im Blatt · klassische Kaskade: jede Ebene öffnet neben der vorherigen';
+});
+
+/* ============================ Play: Messlauf ============================ */
+const PATH=['einf','dia','sae','ges'];   /* Einfügen → Diagramm → Säule → Gestapelt */
+const RES={classic:null,peacock:null};
+let PLAYING=false, ABORT=false;
+
+function clearTrail(){ trailSvg.innerHTML=''; cursor.classList.remove('on'); }
+function setCursor(p){ cursor.style.left=p.x+'px'; cursor.style.top=p.y+'px'; }
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function stopPlay(){ ABORT=true; }
+
+function trailAdd(from,to,idx){
+  const l=document.createElementNS(NS,'path');
+  l.setAttribute('d','M '+n(from.x)+' '+n(from.y)+' L '+n(to.x)+' '+n(to.y));
+  l.setAttribute('class','tr');trailSvg.appendChild(l);
+  const c=document.createElementNS(NS,'circle');
+  c.setAttribute('cx',n(to.x));c.setAttribute('cy',n(to.y));c.setAttribute('r','8.5');
+  c.setAttribute('class','wp');trailSvg.appendChild(c);
+  const t=document.createElementNS(NS,'text');
+  t.setAttribute('x',n(to.x));t.setAttribute('y',n(to.y));
+  t.setAttribute('class','wl');t.textContent=String(idx);trailSvg.appendChild(t);
+}
+async function glide(from,to,ms){
+  const steps=Math.max(6,Math.round(ms/16));
+  for(let i=1;i<=steps;i++){
+    if(ABORT) return;
+    const k=i/steps, e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+    setCursor({x:from.x+(to.x-from.x)*e, y:from.y+(to.y-from.y)*e});
+    await sleep(16);
+  }
+}
+
+/* Klickziel des naechsten Schrittes im aktuellen Zustand */
+function targetFor(id){
+  if(MODE==='peacock'){
+    const g=armsSvg.querySelector('g.callout[data-id="'+id+'"]:not(.past)');
+    if(!g) return null;
+    const C={x:+g.dataset.cx,y:+g.dataset.cy}, A={x:+g.dataset.ax,y:+g.dataset.ay};
+    const L=Math.hypot(A.x-C.x,A.y-C.y)||1, d=Math.min(L-2, DOT_R+7);
+    /* Klick am Armanfang, unmittelbar neben dem Konvergenzpunkt */
+    return {x:C.x+(A.x-C.x)/L*d, y:C.y+(A.y-C.y)/L*d, item:g};
+  }
+  const dds=[...stage.querySelectorAll('.dd')];
+  const dd=dds[dds.length-1]; if(!dd) return null;
+  const s=stageRect();
+  for(const row of dd.children){
+    if(row.__id===id || row.textContent.indexOf(labelOf(id))===0){
+      const r=row.getBoundingClientRect();
+      return {x:r.left-s.left+Math.min(60,r.width/2), y:r.top-s.top+r.height/2, item:row};
+    }
+  }
+  return null;
+}
+function labelOf(id){
+  const walk=items=>{ for(const it of items){ if(it.id===id) return it.label;
+    if(it.children){const r=walk(it.children); if(r) return r;} } return null; };
+  for(const k of ORDER){ const r=walk(TREE[k].children); if(r) return r; }
+  return '';
+}
+function findItem(id){
+  const walk=(items,depth)=>{ for(const it of items){ if(it.id===id) return {it,depth};
+    if(it.children){const r=walk(it.children,depth+1); if(r) return r;} } return null; };
+  return walk(TREE['einf'].children,0);
+}
+
+async function play(){
+  if(PLAYING){ stopPlay(); return; }
+  PLAYING=true; ABORT=false;
+  $('#btnPlay').innerHTML='&#9632; Stop';
+  $('#btnPlay').classList.add('running');
+  $('#btnReset').disabled=true;
+  $('#seg').querySelectorAll('button').forEach(b=>b.disabled=true);
+  closeAll(); clearTrail();
+
+  const s=stageRect();
+  /* Gemessen wird der Weg AB dem geoeffneten Menue - der Weg zum Reiter ist in
+     beiden Ansichten identisch und wuerde den Vergleich nur verwaessern. */
+  const tr=tabEl('einf').getBoundingClientRect();
+  let cur={x:tr.left-s.left+tr.width/2, y:tr.top-s.top+tr.height/2};
+  setCursor(cur); cursor.classList.add('on');
+  await sleep(240);
+  let dist=0, step=0;
+  trailAdd(cur,cur,++step);
+  onTabClick('einf'); await sleep(340);
+
+  /* Schritte 2..4: Diagramm -> Saeule -> Gestapelt */
+  for(let i=1;i<PATH.length;i++){
+    const id=PATH[i];
+    const t=targetFor(id);
+    if(!t||ABORT) break;
+    const to={x:t.x,y:t.y};
+    await glide(cur,to,MODE==='peacock'?340:520);
+    dist+=Math.hypot(to.x-cur.x,to.y-cur.y);
+    trailAdd(cur,to,++step); cur=to;
+    const fi=findItem(id);
+    if(ABORT) break;
+    choose(fi.it, fi.depth, {x:to.x,y:to.y});
+    await sleep(320);
+  }
+
+  if(!ABORT){ RES[MODE]=Math.round(dist); updateHud(); await sleep(400); }
+  else { clearTrail(); closeAll(); }
+  PLAYING=false; ABORT=false;
+  $('#btnPlay').innerHTML='&#9654; Play';
+  $('#btnPlay').classList.remove('running');
+  $('#btnReset').disabled=false;
+  $('#seg').querySelectorAll('button').forEach(b=>b.disabled=false);
+}
+function updateHud(){
+  $('#hCls').textContent = RES.classic!=null ? RES.classic+' px' : '–';
+  $('#hPk').textContent  = RES.peacock!=null ? RES.peacock+' px' : '–';
+  if(BARE) return;                       /* schlanke Fassung: nur der eigene Messwert */
+  if(RES.classic!=null && RES.peacock!=null && RES.classic>0){
+    const p=Math.round((1-RES.peacock/RES.classic)*100);
+    $('#hSave').textContent='\u2212'+p+' %';
+    $('#hNote').textContent='Zeigerweg ab dem geöffneten Menü — der Weg zum Reiter ist in beiden Ansichten gleich.';
+  } else {
+    $('#hSave').textContent='–';
+    $('#hNote').textContent='Vorgang: Einfügen → Diagramm → Säule → Gestapelt. Jetzt die andere Ansicht messen.';
+  }
+}
+$('#btnPlay').addEventListener('click',ev=>{ev.stopPropagation();play();});
+$('#btnReset').addEventListener('click',ev=>{ev.stopPropagation();
+  RES.classic=null;RES.peacock=null;updateHud();clearTrail();closeAll();});
+
+/* Startzustand gemaess URL-Parametern */
+$('#seg').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.mode===MODE));
+trailSvg.classList.toggle('pk',MODE==='peacock');
+if(LOCK) $('#seg').style.display='none';
+if(BARE){
+  document.body.classList.add('bare');
+  $('#btnReset').style.display='none';
+  $('#hint').style.display='none';
+  document.querySelector('.titlebar').style.display='none';
+  $('#hud').classList.add('bare');
+  document.getElementById(MODE==='peacock'?'rowCls':'rowPk').style.display='none';
+  $('#hud').querySelector('.res').style.display='none';
+  $('#hNote').textContent = MODE==='peacock'
+    ? 'Zeigerweg ab dem geöffneten Menü, Vorgang: Einfügen → Diagramm → Säule → Gestapelt.'
+    : 'Zeigerweg ab dem geöffneten Menü, identischer Vorgang.';
+}
+updateHud();
+render();
+})();
+</script>
+</body></html>
